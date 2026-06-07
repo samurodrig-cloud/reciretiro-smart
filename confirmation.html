@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro Exitoso — ReciRetiro Smart</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo"><span>♻️</span> ReciRetiro Smart</a>
+  <div class="nav-links">
+    <a href="register.html">Registrarse</a>
+    <a href="scan.html">Escanear QR</a>
+    <a href="dashboard.html">Panel Municipal</a>
+  </div>
+</nav>
+
+<div class="container-sm">
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Cargando tu registro...</p>
+  </div>
+
+  <div id="content" style="display:none;">
+    <div class="alert alert-success" style="margin-top: 16px;">
+      ✅ <strong>¡Registro exitoso!</strong> Tu código QR ha sido generado.
+    </div>
+
+    <div class="card" style="text-align: center;">
+      <h2 style="color: var(--green); margin-bottom: 4px;">Tu código único</h2>
+      <div id="resident-code" style="font-size: 2rem; font-weight: 800; color: var(--text); margin: 12px 0; letter-spacing: 2px;"></div>
+
+      <div class="qr-box" style="margin: 24px 0;">
+        <div id="qr-code"></div>
+      </div>
+
+      <div class="alert alert-info">
+        📌 Imprime o guarda este QR y pégalo en tu contenedor de reciclaje. El recolector lo escaneará cada vez que retire tu reciclaje.
+      </div>
+
+      <button onclick="downloadQR()" class="btn btn-outline" style="margin-top: 16px;">
+        ⬇️ Descargar QR
+      </button>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 16px;">Detalles de tu registro</h3>
+      <div id="neighbor-details"></div>
+
+      <hr class="divider">
+
+      <div class="info-row">
+        <span class="info-label">Próximo retiro</span>
+        <span class="info-value" id="next-pickup"></span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Estado</span>
+        <span class="info-value"><span class="badge badge-green">Programado</span></span>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <a id="panel-link" href="#" class="btn btn-primary" style="flex: 1; justify-content: center;">Ver mi panel</a>
+      <a href="dashboard.html" class="btn btn-outline" style="flex: 1; justify-content: center;">Panel municipal</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>ReciRetiro Smart · Municipalidad de Providencia</p>
+</footer>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+
+  const DAYS = { Lunes: 1, Martes: 2, Miércoles: 3, Jueves: 4, Viernes: 5 };
+
+  function getNextPickupDate(preferredDay) {
+    const today = new Date();
+    const target = DAYS[preferredDay] ?? 1;
+    const current = today.getDay() === 0 ? 7 : today.getDay();
+    let diff = target - current;
+    if (diff <= 0) diff += 7;
+    const next = new Date(today);
+    next.setDate(today.getDate() + diff);
+    return next.toLocaleDateString('es-CL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  async function load() {
+    if (!code) {
+      window.location.href = 'register.html';
+      return;
+    }
+
+    const { data, error } = await db.from('neighbors').select('*').eq('code', code).single();
+
+    if (error || !data) {
+      window.location.href = 'register.html';
+      return;
+    }
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+    document.getElementById('resident-code').textContent = data.code;
+    document.getElementById('panel-link').href = 'panel.html?code=' + data.code;
+    document.getElementById('next-pickup').textContent = getNextPickupDate(data.preferred_day);
+
+    document.getElementById('neighbor-details').innerHTML = `
+      <div class="info-row"><span class="info-label">Nombre</span><span class="info-value">${data.name} ${data.last_name}</span></div>
+      <div class="info-row"><span class="info-label">Dirección</span><span class="info-value">${data.address}${data.apartment ? ', ' + data.apartment : ''}</span></div>
+      <div class="info-row"><span class="info-label">Sector</span><span class="info-value">${data.sector}</span></div>
+      <div class="info-row"><span class="info-label">Frecuencia</span><span class="info-value">${data.frequency}</span></div>
+      <div class="info-row"><span class="info-label">Día preferido</span><span class="info-value">${data.preferred_day}</span></div>
+    `;
+
+    const qrUrl = window.location.origin + '/scan.html#pickup/' + data.code;
+    new QRCode(document.getElementById('qr-code'), {
+      text: qrUrl,
+      width: 220,
+      height: 220,
+      colorDark: '#2d7a3a',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  }
+
+  function downloadQR() {
+    const canvas = document.querySelector('#qr-code canvas');
+    if (!canvas) return;
+    const link = document.createElement('a');
+    link.download = 'QR-' + code + '.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  }
+
+  load();
+</script>
+
+</body>
+</html>

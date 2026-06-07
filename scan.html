@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escanear QR — ReciRetiro Smart</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo"><span>♻️</span> ReciRetiro Smart</a>
+  <div class="nav-links">
+    <a href="register.html">Registrarse</a>
+    <a href="scan.html">Escanear QR</a>
+    <a href="dashboard.html">Panel Municipal</a>
+  </div>
+</nav>
+
+<!-- PICKUP RECORD VIEW (shown when URL has #pickup/CODE) -->
+<div id="pickup-view" style="display:none;">
+  <div class="container-sm">
+    <div id="pickup-loading" class="loading" style="margin-top: 48px;">
+      <div class="spinner"></div>
+      <p>Buscando vecino...</p>
+    </div>
+
+    <div id="pickup-content" style="display:none; margin-top: 16px;">
+      <div class="alert alert-info">
+        📱 <strong>Registro de retiro</strong> — Confirma el retiro presionando el botón al final.
+      </div>
+
+      <div class="card">
+        <h2 style="color: var(--green); margin-bottom: 16px;">Ficha del vecino</h2>
+        <div id="pickup-neighbor-info"></div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom: 16px;">Historial de retiros</h3>
+        <div id="pickup-history"></div>
+      </div>
+
+      <div class="card" style="text-align: center;" id="confirm-card">
+        <p style="font-size: 1rem; color: var(--gray-dark); margin-bottom: 20px;">¿Confirmas el retiro de reciclaje de este vecino?</p>
+        <button id="confirm-btn" onclick="confirmPickup()" class="btn btn-primary btn-full" style="font-size: 1.1rem; padding: 16px;">
+          ✅ Marcar como retirado
+        </button>
+        <div id="confirm-result" style="margin-top: 16px;"></div>
+      </div>
+    </div>
+
+    <div id="pickup-not-found" style="display:none;" class="card" style="margin-top: 48px; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 16px;">❌</div>
+      <h2 style="margin-bottom: 8px;">QR no registrado</h2>
+      <p style="color: var(--gray-dark);">Este código no está en el sistema.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SCANNER VIEW (shown by default) -->
+<div id="scanner-view">
+  <div class="container-sm">
+    <div class="page-title" style="margin-top: 8px;">
+      <h1>Escanear código QR</h1>
+      <p>Apunta la cámara al QR del contenedor del vecino.</p>
+    </div>
+
+    <div class="card">
+      <div id="qr-reader"></div>
+      <div id="scan-result" style="margin-top: 16px;"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 12px;">Ingreso manual</h3>
+      <p style="font-size: 0.88rem; color: var(--gray-dark); margin-bottom: 16px;">Si la cámara no funciona, ingresa el código directamente.</p>
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="manual-code" placeholder="Ej: REC-PROV-1842" style="flex: 1; padding: 12px 14px; border: 1.5px solid var(--gray-mid); border-radius: 8px; font-size: 1rem;">
+        <button onclick="searchManual()" class="btn btn-primary">Buscar</button>
+      </div>
+      <div id="manual-result" style="margin-top: 12px;"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>ReciRetiro Smart · Municipalidad de Providencia</p>
+</footer>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let currentNeighbor = null;
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleDateString('es-CL', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  function extractCode(text) {
+    const hashMatch = text.match(/#pickup\/([A-Z0-9\-]+)/);
+    if (hashMatch) return hashMatch[1];
+    const directMatch = text.match(/REC-PROV-\d+/);
+    if (directMatch) return directMatch[0];
+    return text.trim().toUpperCase();
+  }
+
+  async function loadPickupView(code) {
+    document.getElementById('scanner-view').style.display = 'none';
+    document.getElementById('pickup-view').style.display = 'block';
+    document.getElementById('pickup-loading').style.display = 'block';
+    document.getElementById('pickup-content').style.display = 'none';
+    document.getElementById('pickup-not-found').style.display = 'none';
+
+    const { data: neighbor, error } = await db.from('neighbors').select('*').eq('code', code).single();
+
+    document.getElementById('pickup-loading').style.display = 'none';
+
+    if (error || !neighbor) {
+      document.getElementById('pickup-not-found').style.display = 'block';
+      return;
+    }
+
+    currentNeighbor = neighbor;
+    document.getElementById('pickup-content').style.display = 'block';
+
+    document.getElementById('pickup-neighbor-info').innerHTML = `
+      <div class="info-row"><span class="info-label">Código</span><span class="info-value" style="font-family:monospace;">${neighbor.code}</span></div>
+      <div class="info-row"><span class="info-label">Nombre</span><span class="info-value">${neighbor.name} ${neighbor.last_name}</span></div>
+      <div class="info-row"><span class="info-label">Dirección</span><span class="info-value">${neighbor.address}${neighbor.apartment ? ', ' + neighbor.apartment : ''}</span></div>
+      <div class="info-row"><span class="info-label">Sector</span><span class="info-value">${neighbor.sector}</span></div>
+      <div class="info-row"><span class="info-label">Teléfono</span><span class="info-value">${neighbor.phone || '—'}</span></div>
+      <div class="info-row"><span class="info-label">Frecuencia</span><span class="info-value">${neighbor.frequency}</span></div>
+      <div class="info-row"><span class="info-label">Estado</span><span class="info-value"><span class="badge badge-green">Activo</span></span></div>
+    `;
+
+    const { data: pickups } = await db.from('pickups').select('*').eq('neighbor_code', code).order('pickup_date', { ascending: false }).limit(5);
+
+    if (!pickups || pickups.length === 0) {
+      document.getElementById('pickup-history').innerHTML = '<p style="color: var(--gray-dark); font-size: 0.9rem;">Sin retiros previos registrados.</p>';
+    } else {
+      const lastPickup = pickups[0];
+      let rows = pickups.map(p => `<tr><td>${formatDate(p.pickup_date)}</td><td>${p.bags || 1} bolsa(s)</td><td><span class="badge badge-green">✅ Retirado</span></td></tr>`).join('');
+      document.getElementById('pickup-history').innerHTML = `
+        <div class="info-row"><span class="info-label">Último retiro</span><span class="info-value">${formatDate(lastPickup.pickup_date)}</span></div>
+        <div class="info-row"><span class="info-label">Total retiros</span><span class="info-value">${pickups.length}</span></div>
+        <div class="table-wrapper" style="margin-top:12px;">
+          <table><thead><tr><th>Fecha</th><th>Bolsas</th><th>Estado</th></tr></thead>
+          <tbody>${rows}</tbody></table>
+        </div>`;
+    }
+  }
+
+  async function confirmPickup() {
+    if (!currentNeighbor) return;
+
+    const btn = document.getElementById('confirm-btn');
+    btn.disabled = true;
+    btn.textContent = 'Registrando...';
+
+    const today = new Date().toISOString().split('T')[0];
+
+    const { error } = await db.from('pickups').insert([{
+      neighbor_code: currentNeighbor.code,
+      pickup_date: today,
+      status: 'picked_up',
+      bags: 1
+    }]);
+
+    if (error) {
+      document.getElementById('confirm-result').innerHTML = '<div class="alert alert-error">❌ Error al registrar. Intenta nuevamente.</div>';
+      btn.disabled = false;
+      btn.textContent = '✅ Marcar como retirado';
+      return;
+    }
+
+    document.getElementById('confirm-card').innerHTML = `
+      <div class="alert alert-success" style="justify-content: center; font-size: 1rem;">
+        ✅ <strong>Retiro registrado exitosamente.</strong>
+      </div>
+      <p style="color: var(--gray-dark); font-size: 0.9rem; margin-top: 8px;">Vecino: <strong>${currentNeighbor.name} ${currentNeighbor.last_name}</strong></p>
+      <p style="color: var(--gray-dark); font-size: 0.9rem;">Código: <strong>${currentNeighbor.code}</strong></p>
+      <p style="color: var(--gray-dark); font-size: 0.9rem;">Fecha: <strong>${new Date().toLocaleDateString('es-CL')}</strong></p>
+      <a href="scan.html" class="btn btn-outline" style="margin-top: 16px; width: 100%;">Escanear otro QR</a>
+    `;
+  }
+
+  function searchManual() {
+    const raw = document.getElementById('manual-code').value.trim();
+    if (!raw) return;
+    const code = extractCode(raw);
+    window.location.hash = '#pickup/' + code;
+    loadPickupView(code);
+  }
+
+  document.getElementById('manual-code').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') searchManual();
+  });
+
+  // Check if URL has #pickup/CODE on load
+  function checkHash() {
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#pickup/')) {
+      const code = hash.replace('#pickup/', '').trim();
+      if (code) {
+        loadPickupView(code);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  if (!checkHash()) {
+    // Start QR scanner
+    const html5QrCode = new Html5Qrcode('qr-reader');
+    html5QrCode.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      (decodedText) => {
+        html5QrCode.stop();
+        const code = extractCode(decodedText);
+        window.location.hash = '#pickup/' + code;
+        loadPickupView(code);
+      },
+      () => {}
+    ).catch(() => {
+      document.getElementById('scan-result').innerHTML = '<div class="alert alert-warning">⚠️ No se pudo acceder a la cámara. Usa el ingreso manual.</div>';
+    });
+  }
+</script>
+
+</body>
+</html>
