@@ -104,10 +104,19 @@
 </div>
 
 <div id="not-found" style="display:none;" class="container-sm">
-  <div class="card" style="text-align: center; margin-top: 48px;">
-    <h2 style="margin-bottom: 8px;">Vecino no encontrado</h2>
-    <p style="color: var(--gray-dark); margin-bottom: 24px;">No encontramos un registro con ese código.</p>
-    <a href="register.html" class="btn btn-primary">Registrarme ahora</a>
+  <div class="card" style="margin-top: 48px;">
+    <div style="text-align:center; margin-bottom: 24px;">
+      <h2 style="margin-bottom: 6px;">Acceder a mi panel</h2>
+      <p style="color: var(--gray-dark); font-size: 0.9rem;">Ingresa tu código único para ver tu panel de vecino.</p>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <input type="text" id="search-code" placeholder="Ej: REC-PROV-1842"
+        style="flex:1; padding:10px 14px; border:1.5px solid var(--gray-mid); border-radius:8px; font-size:0.93rem; font-family:inherit;">
+      <button onclick="searchPanel()" class="btn btn-primary">Buscar</button>
+    </div>
+    <div id="search-error" style="margin-top:12px;"></div>
+    <hr class="divider">
+    <p style="font-size:0.85rem; color:var(--gray-dark); text-align:center;">¿No tienes código? <a href="register.html" style="color:var(--green); font-weight:600;">Regístrate aquí</a></p>
   </div>
 </div>
 
@@ -153,7 +162,9 @@
 
     if (error || !neighbor) {
       document.getElementById('loading').style.display = 'none';
-      document.getElementById('not-found').style.display = 'block';
+      const notFound = document.getElementById('not-found');
+      notFound.style.display = 'block';
+      document.getElementById('search-error').innerHTML = '<div class="alert alert-error">Código no encontrado. Verifica e intenta nuevamente.</div>';
       return;
     }
 
@@ -213,6 +224,19 @@
       correctLevel: QRCode.CorrectLevel.H
     });
   }
+
+  function searchPanel() {
+    const raw = document.getElementById('search-code').value.trim().toUpperCase();
+    if (!raw) return;
+    const match = raw.match(/REC-PROV-\d+/);
+    const code = match ? match[0] : raw;
+    window.location.href = 'panel.html?code=' + code;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    const input = document.getElementById('search-code');
+    if (e.key === 'Enter' && input && document.activeElement === input) searchPanel();
+  });
 
   function downloadQR() {
     const canvas = document.querySelector('#qr-code canvas');

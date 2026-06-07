@@ -29,12 +29,48 @@
   </div>
 </nav>
 
+<div id="map-fallback" style="display:none; text-align:center; padding: 80px 24px;">
+  <h2 style="margin-bottom: 12px;">El mapa no pudo cargarse</h2>
+  <p style="color: var(--gray-dark); margin-bottom: 24px; font-size: 0.95rem;">El sitio externo no está disponible en este momento.</p>
+  <a href="https://santiagorecicla.mma.gob.cl/mapa/" target="_blank" class="btn btn-primary btn-lg">
+    Abrir mapa en nueva pestaña
+  </a>
+</div>
+
 <iframe
+  id="map-frame"
   src="https://santiagorecicla.mma.gob.cl/mapa/"
   class="map-wrapper"
   title="Puntos limpios de Santiago — Ministerio del Medio Ambiente"
-  allowfullscreen>
+  allowfullscreen
+  onload="checkMapLoad(this)"
+  onerror="showFallback()">
 </iframe>
+
+<script>
+  function showFallback() {
+    document.getElementById('map-frame').style.display = 'none';
+    document.getElementById('map-fallback').style.display = 'block';
+  }
+
+  function checkMapLoad(iframe) {
+    try {
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      if (!doc || doc.body.innerHTML === '') showFallback();
+    } catch(e) {
+      // cross-origin — significa que cargó pero no podemos leerlo, lo cual es correcto
+    }
+  }
+
+  setTimeout(() => {
+    const frame = document.getElementById('map-frame');
+    if (frame.style.display === 'none') return;
+    try {
+      const doc = frame.contentDocument || frame.contentWindow.document;
+      if (doc && doc.title === '') showFallback();
+    } catch(e) {}
+  }, 6000);
+</script>
 
 </body>
 </html>

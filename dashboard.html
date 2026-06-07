@@ -67,8 +67,17 @@
     <div id="dash-content" style="display:none;">
 
       <div class="page-title" style="margin-top: 8px;">
-        <h1>Panel Municipal — Providencia</h1>
-        <p>Trazabilidad de retiros domiciliarios de reciclaje</p>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+          <div>
+            <h1>Panel Municipal — Providencia</h1>
+            <p>Trazabilidad de retiros domiciliarios de reciclaje</p>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
+            <span id="refresh-dot" style="width:8px; height:8px; background:var(--accent); border-radius:50%; display:inline-block;"></span>
+            <span id="refresh-label" style="font-size:0.78rem; color:var(--gray-dark);">En vivo</span>
+            <button onclick="loadDashboard()" class="btn btn-outline" style="padding:5px 12px; font-size:0.78rem;">Actualizar</button>
+          </div>
+        </div>
       </div>
 
       <!-- KPIs -->
@@ -198,8 +207,8 @@
   }
 
   async function loadDashboard() {
-    document.getElementById('dash-loading').style.display = 'block';
-    document.getElementById('dash-content').style.display = 'none';
+    document.getElementById('dash-loading').style.display = 'none';
+    document.getElementById('dash-content').style.display = 'block';
 
     const { data: neighbors } = await db.from('neighbors').select('*').order('created_at', { ascending: false });
     const { data: pickups } = await db.from('pickups').select('*').order('pickup_date', { ascending: false });
@@ -379,11 +388,22 @@
     alert('Se marcó como no retirado. El vecino será notificado en una versión futura.');
   }
 
+  let refreshInterval = null;
+
+  function startAutoRefresh() {
+    if (refreshInterval) clearInterval(refreshInterval);
+    refreshInterval = setInterval(async () => {
+      await loadDashboard();
+      const now = new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('refresh-label').textContent = 'Actualizado ' + now;
+    }, 30000);
+  }
+
   if (sessionStorage.getItem('muni_auth') === 'true') {
     document.getElementById('login-view').style.display = 'none';
     document.getElementById('dashboard-view').style.display = 'block';
     document.getElementById('nav-user').textContent = 'Administrador';
-    loadDashboard();
+    loadDashboard().then(startAutoRefresh);
   }
 </script>
 
