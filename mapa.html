@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Puntos Limpios — ReciRetiro Smart</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .map-wrapper {
+      width: 100%;
+      height: calc(100vh - 60px);
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">RR</div>
+    ReciRetiro Smart
+  </a>
+  <div class="nav-links">
+    <a href="register.html">Registrarse</a>
+    <a href="scan.html">Escanear QR</a>
+    <a href="mapa.html">Puntos limpios</a>
+    <a href="dashboard.html">Panel Municipal</a>
+  </div>
+</nav>
+
+<iframe
+  src="https://santiagorecicla.mma.gob.cl/mapa/"
+  class="map-wrapper"
+  title="Puntos limpios de Santiago — Ministerio del Medio Ambiente"
+  allowfullscreen>
+</iframe>
+
+</body>
+</html>
