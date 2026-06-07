@@ -104,6 +104,19 @@
         </div>
       </div>
 
+      <!-- RECORDATORIOS -->
+      <div class="card">
+        <div class="section-header">
+          <h2>Recordatorios WhatsApp</h2>
+          <button onclick="sendAllReminders()" class="btn btn-primary" style="padding:6px 16px; font-size:0.85rem;" id="send-all-btn">
+            Enviar a todos los de mañana
+          </button>
+        </div>
+        <p style="font-size:0.85rem; color:var(--gray-dark); margin-bottom:16px;">Vecinos con retiro programado para mañana que tienen WhatsApp activado.</p>
+        <div id="reminders-content"></div>
+        <div id="reminders-result" style="margin-top:12px;"></div>
+      </div>
+
       <!-- SECTORS -->
       <div class="card">
         <h2 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 16px;">Participación por sector</h2>
@@ -220,6 +233,7 @@
     document.getElementById('dash-content').style.display = 'block';
 
     renderKPIs();
+    renderReminders();
     renderSectors();
     renderInactive();
     renderTable(allNeighbors);
@@ -311,6 +325,7 @@
               <button onclick="viewRecord('${n.code}')" class="btn btn-outline" style="padding:5px 10px; font-size:0.78rem;">Ver ficha</button>
               <button onclick="markPickup('${n.code}')" class="btn btn-primary" style="padding:5px 10px; font-size:0.78rem;">Retirado</button>
               <button onclick="markNoPickup('${n.code}')" class="btn btn-danger" style="padding:5px 10px; font-size:0.78rem;">No retirado</button>
+              ${n.callmebot_apikey ? `<button onclick="sendReminder('${n.code}')" class="btn btn-outline" style="padding:5px 10px; font-size:0.78rem; border-color:#25D366; color:#25D366;">WA</button>` : ''}
             </div>
           </td>
         </tr>`;
@@ -386,6 +401,85 @@
 
   async function markNoPickup(code) {
     alert('Se marcó como no retirado. El vecino será notificado en una versión futura.');
+  }
+
+  function getTomorrowDay() {
+    const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return days[tomorrow.getDay()];
+  }
+
+  function getTomorrowNeighbors() {
+    const tomorrow = getTomorrowDay();
+    return allNeighbors.filter(n => n.preferred_day === tomorrow && n.callmebot_apikey && n.phone);
+  }
+
+  function renderReminders() {
+    const list = getTomorrowNeighbors();
+    if (list.length === 0) {
+      document.getElementById('reminders-content').innerHTML = `
+        <p style="font-size:0.88rem; color:var(--gray-dark);">
+          No hay vecinos con retiro mañana (${getTomorrowDay()}) que tengan WhatsApp activado.
+        </p>`;
+      return;
+    }
+    let rows = list.map(n => `
+      <tr>
+        <td style="font-family:monospace; font-size:0.82rem;">${n.code}</td>
+        <td><strong>${n.name} ${n.last_name}</strong></td>
+        <td>${n.phone}</td>
+        <td>${n.preferred_day}</td>
+        <td><span class="badge badge-green">WhatsApp activo</span></td>
+      </tr>`).join('');
+    document.getElementById('reminders-content').innerHTML = `
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Código</th><th>Vecino</th><th>Teléfono</th><th>Día</th><th>Estado</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+
+  async function sendWhatsApp(phone, apikey, name, day) {
+    const text = encodeURIComponent(
+      `Hola ${name}, te recordamos que mañana (${day}) pasará el camión de reciclaje entre las 09:00 y las 13:00 hrs. Por favor deja tu reciclaje junto al contenedor con tu código QR visible. — ReciRetiro Smart, Municipalidad de Providencia`
+    );
+    const url = `https://api.callmebot.com/whatsapp.php?phone=${phone.replace(/\s|\+/g,'')}&text=${text}&apikey=${apikey}`;
+    await fetch(url, { mode: 'no-cors' });
+  }
+
+  async function sendReminder(code) {
+    const n = allNeighbors.find(x => x.code === code);
+    if (!n || !n.callmebot_apikey || !n.phone) {
+      alert('Este vecino no tiene WhatsApp activado.');
+      return;
+    }
+    const tomorrow = getTomorrowDay();
+    await sendWhatsApp(n.phone, n.callmebot_apikey, n.name, tomorrow);
+    document.getElementById('reminders-result').innerHTML = `<div class="alert alert-success">Recordatorio enviado a ${n.name} ${n.last_name}.</div>`;
+    setTimeout(() => document.getElementById('reminders-result').innerHTML = '', 4000);
+  }
+
+  async function sendAllReminders() {
+    const list = getTomorrowNeighbors();
+    if (list.length === 0) {
+      alert('No hay vecinos con retiro mañana que tengan WhatsApp activado.');
+      return;
+    }
+    const btn = document.getElementById('send-all-btn');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+    const tomorrow = getTomorrowDay();
+    for (const n of list) {
+      await sendWhatsApp(n.phone, n.callmebot_apikey, n.name, tomorrow);
+      await new Promise(r => setTimeout(r, 1500));
+    }
+    btn.disabled = false;
+    btn.textContent = 'Enviar a todos los de mañana';
+    document.getElementById('reminders-result').innerHTML = `
+      <div class="alert alert-success">Recordatorios enviados a ${list.length} vecino(s).</div>`;
+    setTimeout(() => document.getElementById('reminders-result').innerHTML = '', 5000);
   }
 
   let refreshInterval = null;
