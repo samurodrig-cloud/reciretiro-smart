@@ -9,7 +9,10 @@
 <body>
 
 <nav>
-  <a href="index.html" class="nav-logo"><span>♻️</span> ReciRetiro Smart</a>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">RR</div>
+    ReciRetiro Smart
+  </a>
   <div class="nav-links">
     <a href="register.html">Registrarse</a>
     <a href="scan.html">Escanear QR</a>
@@ -25,34 +28,32 @@
 
   <div id="content" style="display:none;">
     <div class="alert alert-success" style="margin-top: 16px;">
-      ✅ <strong>¡Registro exitoso!</strong> Tu código QR ha sido generado.
+      Registro exitoso. Tu código QR ha sido generado correctamente.
     </div>
 
     <div class="card" style="text-align: center;">
-      <h2 style="color: var(--green); margin-bottom: 4px;">Tu código único</h2>
-      <div id="resident-code" style="font-size: 2rem; font-weight: 800; color: var(--text); margin: 12px 0; letter-spacing: 2px;"></div>
+      <p style="font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-dark); margin-bottom: 6px;">Tu código único</p>
+      <div id="resident-code" style="font-size: 1.9rem; font-weight: 800; color: var(--text); margin-bottom: 24px; letter-spacing: 2px; font-family: 'Courier New', monospace;"></div>
 
-      <div class="qr-box" style="margin: 24px 0;">
-        <div id="qr-code"></div>
+      <div class="qr-box" style="margin-bottom: 20px;">
+        <div id="qr-code" style="display: inline-block;"></div>
       </div>
 
-      <div class="alert alert-info">
-        📌 Imprime o guarda este QR y pégalo en tu contenedor de reciclaje. El recolector lo escaneará cada vez que retire tu reciclaje.
+      <div class="alert alert-info" style="text-align: left;">
+        Imprime o guarda este código QR y pégalo en tu contenedor de reciclaje. El recolector lo escaneará en cada retiro.
       </div>
 
-      <button onclick="downloadQR()" class="btn btn-outline" style="margin-top: 16px;">
-        ⬇️ Descargar QR
+      <button onclick="downloadQR()" class="btn btn-outline btn-full" style="margin-top: 8px;">
+        Descargar código QR
       </button>
     </div>
 
     <div class="card">
-      <h3 style="margin-bottom: 16px;">Detalles de tu registro</h3>
+      <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 16px; color: var(--text);">Detalles de tu registro</h3>
       <div id="neighbor-details"></div>
-
       <hr class="divider">
-
       <div class="info-row">
-        <span class="info-label">Próximo retiro</span>
+        <span class="info-label">Próximo retiro estimado</span>
         <span class="info-value" id="next-pickup"></span>
       </div>
       <div class="info-row">
@@ -62,14 +63,14 @@
     </div>
 
     <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-      <a id="panel-link" href="#" class="btn btn-primary" style="flex: 1; justify-content: center;">Ver mi panel</a>
-      <a href="dashboard.html" class="btn btn-outline" style="flex: 1; justify-content: center;">Panel municipal</a>
+      <a id="panel-link" href="#" class="btn btn-primary btn-lg" style="flex: 1;">Ver mi panel</a>
+      <a href="dashboard.html" class="btn btn-outline btn-lg" style="flex: 1;">Panel municipal</a>
     </div>
   </div>
 </div>
 
 <footer>
-  <p>ReciRetiro Smart · Municipalidad de Providencia</p>
+  ReciRetiro Smart &nbsp;&middot;&nbsp; Municipalidad de Providencia
 </footer>
 
 <script src="config.js"></script>
@@ -78,10 +79,8 @@
 <script>
   const { createClient } = supabase;
   const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
-
   const DAYS = { Lunes: 1, Martes: 2, Miércoles: 3, Jueves: 4, Viernes: 5 };
 
   function getNextPickupDate(preferredDay) {
@@ -96,17 +95,9 @@
   }
 
   async function load() {
-    if (!code) {
-      window.location.href = 'register.html';
-      return;
-    }
-
+    if (!code) { window.location.href = 'register.html'; return; }
     const { data, error } = await db.from('neighbors').select('*').eq('code', code).single();
-
-    if (error || !data) {
-      window.location.href = 'register.html';
-      return;
-    }
+    if (error || !data) { window.location.href = 'register.html'; return; }
 
     document.getElementById('loading').style.display = 'none';
     document.getElementById('content').style.display = 'block';
@@ -127,7 +118,7 @@
       text: qrUrl,
       width: 220,
       height: 220,
-      colorDark: '#2d7a3a',
+      colorDark: '#1a4731',
       colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.H
     });

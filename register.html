@@ -9,7 +9,10 @@
 <body>
 
 <nav>
-  <a href="index.html" class="nav-logo"><span>♻️</span> ReciRetiro Smart</a>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">RR</div>
+    ReciRetiro Smart
+  </a>
   <div class="nav-links">
     <a href="register.html">Registrarse</a>
     <a href="scan.html">Escanear QR</a>
@@ -104,15 +107,15 @@
 
       <hr class="divider">
 
-      <button type="submit" class="btn btn-primary btn-full" id="submit-btn">
-        Registrarme y obtener mi QR
+      <button type="submit" class="btn btn-primary btn-full btn-lg" id="submit-btn">
+        Registrarme y obtener mi código QR
       </button>
     </form>
   </div>
 </div>
 
 <footer>
-  <p>ReciRetiro Smart · Municipalidad de Providencia</p>
+  ReciRetiro Smart &nbsp;&middot;&nbsp; Municipalidad de Providencia
 </footer>
 
 <script src="config.js"></script>
@@ -134,7 +137,6 @@
 
   document.getElementById('register-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const btn = document.getElementById('submit-btn');
     const alertBox = document.getElementById('alert-box');
     btn.disabled = true;
@@ -161,9 +163,9 @@
     const { error } = await db.from('neighbors').insert([neighbor]);
 
     if (error) {
-      alertBox.innerHTML = '<div class="alert alert-error">❌ Error al registrar. Por favor intenta nuevamente.</div>';
+      alertBox.innerHTML = '<div class="alert alert-error">Error al registrar. Por favor intenta nuevamente.</div>';
       btn.disabled = false;
-      btn.textContent = 'Registrarme y obtener mi QR';
+      btn.textContent = 'Registrarme y obtener mi código QR';
       return;
     }
 

@@ -9,7 +9,10 @@
 <body>
 
 <nav>
-  <a href="index.html" class="nav-logo"><span>♻️</span> ReciRetiro Smart</a>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">RR</div>
+    ReciRetiro Smart
+  </a>
   <div class="nav-links">
     <a href="register.html">Registrarse</a>
     <a href="scan.html">Escanear QR</a>
@@ -26,7 +29,6 @@
   <div class="container">
 
     <div class="reminder-box" style="margin-bottom: 24px;">
-      <span class="reminder-icon">🔔</span>
       <p><strong>Recordatorio:</strong> mañana se realizará el retiro de tu reciclaje entre las 09:00 y las 13:00 hrs. Por favor deja tu reciclaje junto al contenedor con el código QR visible.</p>
     </div>
 
@@ -34,12 +36,12 @@
 
       <div>
         <div class="card">
-          <h3 style="margin-bottom: 16px; color: var(--green);">Tu información</h3>
+          <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 16px; color: var(--text);">Tu información</h3>
           <div id="neighbor-info"></div>
         </div>
 
         <div class="card">
-          <h3 style="margin-bottom: 16px; color: var(--green);">Próximo retiro</h3>
+          <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 16px; color: var(--text);">Próximo retiro</h3>
           <div class="info-row">
             <span class="info-label">Fecha estimada</span>
             <span class="info-value" id="next-date"></span>
@@ -55,7 +57,7 @@
         </div>
 
         <div class="card">
-          <h3 style="margin-bottom: 16px; color: var(--green);">Impacto estimado</h3>
+          <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 16px; color: var(--text);">Impacto estimado</h3>
           <div class="impact-grid" id="impact-grid">
             <div class="impact-item">
               <div class="impact-number" id="total-pickups">0</div>
@@ -79,11 +81,11 @@
 
       <div>
         <div class="card" style="text-align: center;">
-          <h3 style="margin-bottom: 8px; color: var(--green);">Tu código QR</h3>
-          <p style="font-size: 0.85rem; color: var(--gray-dark); margin-bottom: 16px;">Muestra este QR al recolector o pégalo en tu contenedor</p>
+          <p style="font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-dark); margin-bottom: 4px;">Tu código QR</p>
+          <p style="font-size: 0.85rem; color: var(--gray-dark); margin-bottom: 20px;">Presenta este código al recolector o pégalo en tu contenedor</p>
           <div id="qr-code" style="display: inline-block;"></div>
-          <div id="resident-code" style="font-size: 1.1rem; font-weight: 700; margin-top: 12px; color: var(--text); letter-spacing: 1px;"></div>
-          <button onclick="downloadQR()" class="btn btn-outline" style="margin-top: 16px; width: 100%;">⬇️ Descargar QR</button>
+          <div id="resident-code" style="font-size: 1rem; font-weight: 700; margin-top: 14px; color: var(--text); letter-spacing: 1px; font-family: 'Courier New', monospace;"></div>
+          <button onclick="downloadQR()" class="btn btn-outline btn-full" style="margin-top: 16px;">Descargar código QR</button>
         </div>
       </div>
 
@@ -102,7 +104,6 @@
 
 <div id="not-found" style="display:none;" class="container-sm">
   <div class="card" style="text-align: center; margin-top: 48px;">
-    <div style="font-size: 3rem; margin-bottom: 16px;">❓</div>
     <h2 style="margin-bottom: 8px;">Vecino no encontrado</h2>
     <p style="color: var(--gray-dark); margin-bottom: 24px;">No encontramos un registro con ese código.</p>
     <a href="register.html" class="btn btn-primary">Registrarme ahora</a>
@@ -110,7 +111,7 @@
 </div>
 
 <footer>
-  <p>ReciRetiro Smart · Municipalidad de Providencia</p>
+  ReciRetiro Smart &nbsp;&middot;&nbsp; Municipalidad de Providencia
 </footer>
 
 <script src="config.js"></script>
@@ -119,10 +120,8 @@
 <script>
   const { createClient } = supabase;
   const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
-
   const DAYS = { Lunes: 1, Martes: 2, Miércoles: 3, Jueves: 4, Viernes: 5 };
 
   function getNextPickupDate(preferredDay) {
@@ -176,20 +175,15 @@
 
     const totalPickups = pickups ? pickups.length : 0;
     const totalBags = pickups ? pickups.reduce((s, p) => s + (p.bags || 1), 0) : 0;
-    const totalKg = (totalBags * 3.5).toFixed(1);
-    const totalCo2 = (totalBags * 1.2).toFixed(1);
-
     document.getElementById('total-pickups').textContent = totalPickups;
     document.getElementById('total-bags').textContent = totalBags;
-    document.getElementById('total-kg').textContent = totalKg;
-    document.getElementById('total-co2').textContent = totalCo2;
-
+    document.getElementById('total-kg').textContent = (totalBags * 3.5).toFixed(1);
+    document.getElementById('total-co2').textContent = (totalBags * 1.2).toFixed(1);
     document.getElementById('history-count').textContent = totalPickups + ' retiros';
 
     if (!pickups || pickups.length === 0) {
       document.getElementById('history-content').innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">📭</div>
           <p>Aún no hay retiros registrados. Tu primer retiro aparecerá aquí una vez que el recolector confirme la visita.</p>
         </div>`;
     } else {
@@ -197,7 +191,7 @@
         <tr>
           <td>${formatDate(p.pickup_date)}</td>
           <td>${p.bags || 1} bolsa(s)</td>
-          <td><span class="badge badge-green">✅ Retirado</span></td>
+          <td><span class="badge badge-green">Retirado</span></td>
         </tr>`).join('');
       document.getElementById('history-content').innerHTML = `
         <div class="table-wrapper">
@@ -213,7 +207,7 @@
       text: qrUrl,
       width: 200,
       height: 200,
-      colorDark: '#2d7a3a',
+      colorDark: '#1a4731',
       colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.H
     });
