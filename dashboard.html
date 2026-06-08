@@ -146,6 +146,28 @@
         <div id="inactive-content"></div>
       </div>
 
+      <!-- EXPORTAR CSV -->
+      <div class="card">
+        <div class="section-header">
+          <h2>Exportar datos</h2>
+        </div>
+        <p style="font-size:0.85rem; color:var(--gray-dark); margin-bottom:16px;">
+          Descarga la lista de vecinos en formato Excel/CSV para uso interno de la DAOM.
+        </p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button onclick="exportCSV('todos')" class="btn btn-outline" style="padding:8px 18px; font-size:0.85rem;">
+            Exportar todos los vecinos
+          </button>
+          <button onclick="exportCSV('nivel')" class="btn btn-outline" style="padding:8px 18px; font-size:0.85rem;">
+            Exportar por nivel (Plata, Oro, Esmeralda)
+          </button>
+          <button onclick="exportCSV('activos')" class="btn btn-outline" style="padding:8px 18px; font-size:0.85rem;">
+            Exportar activos últimos 6 meses
+          </button>
+        </div>
+        <div id="csv-result" style="margin-top:12px;"></div>
+      </div>
+
       <!-- NEIGHBORS TABLE -->
       <div class="card">
         <div class="section-header">
@@ -568,6 +590,69 @@
     document.getElementById('reminders-result').innerHTML = `
       <div class="alert alert-success">Recordatorios enviados a ${list.length} vecino(s).</div>`;
     setTimeout(() => document.getElementById('reminders-result').innerHTML = '', 5000);
+  }
+
+  function exportCSV(tipo) {
+    const seisM = new Date();
+    seisM.setMonth(seisM.getMonth() - 6);
+
+    let vecinos = allNeighbors;
+
+    if (tipo === 'nivel') {
+      vecinos = allNeighbors.filter(n => {
+        const nivel = calcularNivelVecino(n.code);
+        return nivel.nombre !== 'Bronce';
+      });
+    } else if (tipo === 'activos') {
+      vecinos = allNeighbors.filter(n => {
+        return allPickups.some(p =>
+          p.neighbor_code === n.code &&
+          new Date(p.created_at || p.pickup_date) >= seisM
+        );
+      });
+    }
+
+    if (vecinos.length === 0) {
+      document.getElementById('csv-result').innerHTML =
+        '<div class="alert alert-info">No hay vecinos en esta categoría para exportar.</div>';
+      setTimeout(() => document.getElementById('csv-result').innerHTML = '', 4000);
+      return;
+    }
+
+    const headers = ['Código','Nombre','Apellido','Dirección','Sector','Teléfono','Email','Frecuencia','Día preferido','Nivel','Retiros totales','Último retiro'];
+    const rows = vecinos.map(n => {
+      const nivel = calcularNivelVecino(n.code);
+      const ultimoRetiro = getLastPickup(n.code) || '';
+      return [
+        n.code,
+        n.name,
+        n.last_name,
+        (n.address + (n.apartment ? ' ' + n.apartment : '')).replace(/,/g, ' '),
+        n.sector,
+        n.phone || '',
+        n.email || '',
+        n.frequency,
+        n.preferred_day,
+        nivel.nombre,
+        getPickupCount(n.code),
+        ultimoRetiro
+      ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
+    });
+
+    const csv = '﻿' + [headers.join(','), ...rows].join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const fecha = new Date().toISOString().split('T')[0];
+    const nombres = { todos: 'todos', nivel: 'por-nivel', activos: 'activos-6meses' };
+    a.href = url;
+    a.download = `reciretiro-vecinos-${nombres[tipo]}-${fecha}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    document.getElementById('csv-result').innerHTML =
+      `<div class="alert alert-success">Descargando ${vecinos.length} vecino(s).</div>`;
+    setTimeout(() => document.getElementById('csv-result').innerHTML = '', 4000);
   }
 
   let refreshInterval = null;
