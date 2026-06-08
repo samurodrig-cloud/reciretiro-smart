@@ -52,6 +52,7 @@
     <div class="nav-links">
       <a href="register.html">Registrarse</a>
       <a href="scan.html">Escanear QR</a>
+    <a href="beneficios.html">Beneficios</a>
     <a href="mapa.html">Puntos limpios</a>
       <span id="nav-user"></span>
       <a href="#" onclick="logout()">Salir</a>
@@ -102,6 +103,18 @@
           <div class="kpi-number" id="kpi-inactive">—</div>
           <div class="kpi-label">Vecinos inactivos</div>
         </div>
+      </div>
+
+      <!-- NIVELES -->
+      <div class="card">
+        <div class="section-header">
+          <h2>Distribucion por nivel de beneficios</h2>
+          <button onclick="notifyLevelChanges()" class="btn btn-outline" style="padding:5px 12px; font-size:0.8rem;" id="notify-levels-btn">
+            Notificar cambios de nivel
+          </button>
+        </div>
+        <div id="niveles-kpi" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:12px;"></div>
+        <div id="niveles-result"></div>
       </div>
 
       <!-- RECORDATORIOS -->
@@ -233,6 +246,7 @@
     document.getElementById('dash-content').style.display = 'block';
 
     renderKPIs();
+    renderNiveles();
     renderReminders();
     renderSectors();
     renderInactive();
@@ -401,6 +415,80 @@
 
   async function markNoPickup(code) {
     alert('Se marcó como no retirado. El vecino será notificado en una versión futura.');
+  }
+
+  function calcularNivelVecino(neighborCode) {
+    const seisM = new Date();
+    seisM.setMonth(seisM.getMonth() - 6);
+    const retiros = allPickups.filter(p =>
+      p.neighbor_code === neighborCode &&
+      new Date(p.created_at || p.pickup_date) >= seisM
+    ).length;
+    if (retiros >= 24) return { nombre: 'Esmeralda', color: '#1e5f3f', bg: '#e8f2ec', retiros };
+    if (retiros >= 12) return { nombre: 'Oro',        color: '#b8860b', bg: '#fef9e7', retiros };
+    if (retiros >= 5)  return { nombre: 'Plata',      color: '#707070', bg: '#f0f0f0', retiros };
+    return                    { nombre: 'Bronce',     color: '#a0632a', bg: '#f5ebe0', retiros };
+  }
+
+  function renderNiveles() {
+    const conteo = { Bronce: 0, Plata: 0, Oro: 0, Esmeralda: 0 };
+    allNeighbors.forEach(n => {
+      const nivel = calcularNivelVecino(n.code);
+      conteo[nivel.nombre]++;
+    });
+
+    const colores = {
+      Bronce:    { color: '#a0632a', bg: '#f5ebe0', border: '#a0632a' },
+      Plata:     { color: '#707070', bg: '#f0f0f0', border: '#707070' },
+      Oro:       { color: '#b8860b', bg: '#fef9e7', border: '#b8860b' },
+      Esmeralda: { color: '#1e5f3f', bg: '#e8f2ec', border: '#2d7a52' }
+    };
+
+    document.getElementById('niveles-kpi').innerHTML = Object.entries(conteo).map(([nombre, count]) => {
+      const c = colores[nombre];
+      return `
+        <div style="background:${c.bg}; border:1.5px solid ${c.border}20; border-radius:10px; padding:16px 14px; border-top:3px solid ${c.border};">
+          <div style="font-size:1.6rem; font-weight:800; color:${c.color}; line-height:1;">${count}</div>
+          <div style="font-size:0.78rem; color:${c.color}; font-weight:600; margin-top:4px;">${nombre}</div>
+        </div>`;
+    }).join('');
+  }
+
+  const MENSAJES_NIVEL = {
+    Plata:     (nombre) => `Felicitaciones ${nombre}. Has alcanzado el nivel Plata en ReciRetiro Smart. Ya puedes solicitar tu Kit Vermicompostera e inscribirte con prioridad en talleres de reciclaje. Mas informacion en reciretiro-smart.vercel.app/beneficios — ReciRetiro Smart, Municipalidad de Providencia`,
+    Oro:       (nombre) => `Felicitaciones ${nombre}. Has alcanzado el nivel Oro en ReciRetiro Smart. Tus nuevos beneficios incluyen descuento en combustible Petrobras, entradas culturales gratuitas y acceso prioritario a Provisalud. Mas informacion en reciretiro-smart.vercel.app/beneficios — ReciRetiro Smart, Municipalidad de Providencia`,
+    Esmeralda: (nombre) => `Felicitaciones ${nombre}. Has alcanzado el nivel Esmeralda en ReciRetiro Smart, el nivel maximo de participacion. El municipio te contactara para activar tu exencion de derecho de aseo y tu invitacion al Consejo Ambiental Vecinal. — ReciRetiro Smart, Municipalidad de Providencia`
+  };
+
+  async function notifyLevelChanges() {
+    const btn = document.getElementById('notify-levels-btn');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    const elegibles = allNeighbors.filter(n => {
+      const nivel = calcularNivelVecino(n.code);
+      return n.callmebot_apikey && n.phone && nivel.nombre !== 'Bronce' && MENSAJES_NIVEL[nivel.nombre];
+    });
+
+    if (elegibles.length === 0) {
+      document.getElementById('niveles-result').innerHTML = '<div class="alert alert-info">No hay vecinos con WhatsApp activado en niveles Plata, Oro o Esmeralda.</div>';
+      btn.disabled = false;
+      btn.textContent = 'Notificar cambios de nivel';
+      return;
+    }
+
+    for (const n of elegibles) {
+      const nivel = calcularNivelVecino(n.code);
+      const texto = encodeURIComponent(MENSAJES_NIVEL[nivel.nombre](n.name));
+      const url = `https://api.callmebot.com/whatsapp.php?phone=${n.phone.replace(/\s|\+/g,'')}&text=${texto}&apikey=${n.callmebot_apikey}`;
+      await fetch(url, { mode: 'no-cors' });
+      await new Promise(r => setTimeout(r, 1500));
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Notificar cambios de nivel';
+    document.getElementById('niveles-result').innerHTML = `<div class="alert alert-success">Notificaciones enviadas a ${elegibles.length} vecino(s).</div>`;
+    setTimeout(() => document.getElementById('niveles-result').innerHTML = '', 5000);
   }
 
   function getTomorrowDay() {

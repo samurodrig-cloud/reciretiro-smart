@@ -16,6 +16,7 @@
   <div class="nav-links">
     <a href="register.html">Registrarse</a>
     <a href="scan.html">Escanear QR</a>
+    <a href="beneficios.html">Beneficios</a>
     <a href="mapa.html">Puntos limpios</a>
     <a href="dashboard.html">Panel Municipal</a>
   </div>
@@ -90,6 +91,17 @@
         </div>
       </div>
 
+    </div>
+
+    <!-- MIS BENEFICIOS -->
+    <div class="card" id="beneficios-card">
+      <div class="section-header">
+        <h2>Mis beneficios</h2>
+        <a href="beneficios.html" class="btn btn-outline" style="padding:5px 12px; font-size:0.8rem;">Ver catálogo</a>
+      </div>
+      <div id="beneficios-content">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
     </div>
 
     <div class="card">
@@ -214,6 +226,8 @@
         </div>`;
     }
 
+    await renderBeneficios(code);
+
     const qrUrl = window.location.origin + '/scan.html#pickup/' + neighbor.code;
     new QRCode(document.getElementById('qr-code'), {
       text: qrUrl,
@@ -237,6 +251,109 @@
     const input = document.getElementById('search-code');
     if (e.key === 'Enter' && input && document.activeElement === input) searchPanel();
   });
+
+  const NIVELES = [
+    { nombre: 'Bronce',    min: 1,  max: 4,  color: '#a0632a', bg: '#f5ebe0' },
+    { nombre: 'Plata',     min: 5,  max: 11, color: '#707070', bg: '#f0f0f0' },
+    { nombre: 'Oro',       min: 12, max: 23, color: '#b8860b', bg: '#fef9e7' },
+    { nombre: 'Esmeralda', min: 24, max: Infinity, color: '#1e5f3f', bg: '#e8f2ec' }
+  ];
+
+  function calcularNivel(retiros) {
+    if (retiros >= 24) return NIVELES[3];
+    if (retiros >= 12) return NIVELES[2];
+    if (retiros >= 5)  return NIVELES[1];
+    return NIVELES[0];
+  }
+
+  function proximoNivel(retiros) {
+    if (retiros < 5)  return { nombre: 'Plata',     falta: 5  - retiros, meta: 5 };
+    if (retiros < 12) return { nombre: 'Oro',        falta: 12 - retiros, meta: 12 };
+    if (retiros < 24) return { nombre: 'Esmeralda', falta: 24 - retiros, meta: 24 };
+    return null;
+  }
+
+  async function renderBeneficios(neighborCode) {
+    const seisM = new Date();
+    seisM.setMonth(seisM.getMonth() - 6);
+
+    const { data: pickups6m } = await db.from('pickups')
+      .select('id')
+      .eq('neighbor_code', neighborCode)
+      .gte('created_at', seisM.toISOString());
+
+    const retiros = pickups6m ? pickups6m.length : 0;
+    const nivel = calcularNivel(retiros);
+    const proximo = proximoNivel(retiros);
+    const pct = proximo ? Math.min(100, Math.round(((retiros - (proximo.meta - proximo.falta - (proximo.nombre === 'Plata' ? 1 : proximo.nombre === 'Oro' ? 5 : 12))) / (proximo.falta + 1)) * 100)) : 100;
+    const pctBar = proximo
+      ? Math.round((retiros / proximo.meta) * 100)
+      : 100;
+
+    const beneficiosActivos = {
+      Bronce:    ['Historial digital en panel personal', 'Estimacion de CO2 evitado', 'Recordatorio por WhatsApp', 'Acceso al mapa de puntos limpios'],
+      Plata:     ['Kit vermicompostera domiciliaria', 'Inscripcion prioritaria talleres DAOM', 'Certificado digital de reciclador'],
+      Oro:       ['Descuento combustible Petrobras ($15/litro)', 'Entradas gratuitas eventos culturales', 'Acceso prioritario Provisalud', 'Mencion ranking comunal'],
+      Esmeralda: ['Exencion parcial derecho de aseo', 'Acceso preferencial Plaza Persa', 'Reconocimiento publico anual', 'Consejo Ambiental Vecinal']
+    };
+
+    const niveles = ['Bronce', 'Plata', 'Oro', 'Esmeralda'];
+    const idxActual = niveles.indexOf(nivel.nombre);
+    let beneficiosDesbloqueados = [];
+    for (let i = 0; i <= idxActual; i++) {
+      beneficiosDesbloqueados = beneficiosDesbloqueados.concat(beneficiosActivos[niveles[i]]);
+    }
+
+    let html = `
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap;">
+        <div style="background:${nivel.bg}; color:${nivel.color}; padding:4px 14px; border-radius:5px; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;">${nivel.nombre}</div>
+        <span style="font-size:0.88rem; color:var(--gray-dark);">${retiros} retiro${retiros !== 1 ? 's' : ''} en los ultimos 6 meses</span>
+      </div>`;
+
+    if (proximo) {
+      html += `
+      <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:6px;">
+        <span style="color:var(--gray-dark);">Progreso hacia nivel ${proximo.nombre}</span>
+        <span style="font-weight:600; color:var(--green);">${retiros} / ${proximo.meta} retiros</span>
+      </div>
+      <div style="height:7px; background:var(--gray-light); border-radius:100px; overflow:hidden; margin-bottom:16px;">
+        <div style="height:100%; width:${pctBar}%; background:linear-gradient(90deg,var(--green),var(--accent)); border-radius:100px;"></div>
+      </div>
+      <p style="font-size:0.82rem; color:var(--gray-dark); margin-bottom:16px;">Faltan <strong style="color:var(--text);">${proximo.falta} retiro${proximo.falta !== 1 ? 's' : ''}</strong> para alcanzar el nivel ${proximo.nombre}.</p>`;
+    } else {
+      html += `<div class="alert alert-success" style="margin-bottom:16px;">Has alcanzado el nivel maximo: Esmeralda.</div>`;
+    }
+
+    html += `
+      <p style="font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--gray-dark); margin-bottom:10px;">Beneficios activos</p>
+      <div style="display:flex; flex-direction:column; gap:7px;">
+        ${beneficiosDesbloqueados.map(b => `
+          <div style="display:flex; align-items:center; gap:10px; padding:9px 12px; background:var(--green-light); border-radius:7px; font-size:0.845rem;">
+            <div style="width:6px; height:6px; background:var(--green); border-radius:50%; flex-shrink:0;"></div>
+            ${b}
+          </div>`).join('')}
+      </div>`;
+
+    if (proximo) {
+      const siguientes = beneficiosActivos[proximo.nombre] || [];
+      if (siguientes.length > 0) {
+        html += `
+        <p style="font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--gray-dark); margin:16px 0 10px;">Proximos beneficios (nivel ${proximo.nombre})</p>
+        <div style="display:flex; flex-direction:column; gap:7px;">
+          ${siguientes.map(b => `
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 12px; background:var(--gray-bg); border-radius:7px; font-size:0.845rem;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:6px; height:6px; background:var(--gray-mid); border-radius:50%; flex-shrink:0;"></div>
+                <span style="color:var(--gray-dark);">${b}</span>
+              </div>
+              <span style="font-size:0.75rem; color:var(--gray-dark); flex-shrink:0;">${proximo.falta} retiros</span>
+            </div>`).join('')}
+        </div>`;
+      }
+    }
+
+    document.getElementById('beneficios-content').innerHTML = html;
+  }
 
   function downloadQR() {
     const canvas = document.querySelector('#qr-code canvas');

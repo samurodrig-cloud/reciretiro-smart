@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beneficios — ReciRetiro Smart</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bronce: #a0632a;
+      --plata:  #707070;
+      --oro:    #b8860b;
+      --esmeralda: var(--green);
+    }
+
+    .beneficios-hero {
+      background: linear-gradient(135deg, var(--green-dark) 0%, #1a3a6b 100%);
+      color: white;
+      padding: 72px 28px 64px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .beneficios-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(58,158,107,0.15) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .beneficios-hero-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .beneficios-hero h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+
+    .beneficios-hero h1 span {
+      color: #7dd3a8;
+    }
+
+    .beneficios-hero p {
+      font-size: 1.05rem;
+      opacity: 0.82;
+      max-width: 580px;
+      margin-bottom: 32px;
+      line-height: 1.7;
+    }
+
+    .hero-stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .hero-stat-pill {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 14px 20px;
+      min-width: 130px;
+    }
+
+    .hero-stat-pill strong {
+      display: block;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #7dd3a8;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .hero-stat-pill span {
+      font-size: 0.78rem;
+      opacity: 0.72;
+    }
+
+    /* NIVELES */
+    .niveles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .nivel-card {
+      background: white;
+      border: 1.5px solid var(--gray-light);
+      border-radius: var(--radius-lg);
+      padding: 24px 20px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .nivel-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .nivel-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .nivel-card.bronce::before { background: var(--bronce); }
+    .nivel-card.plata::before  { background: var(--plata); }
+    .nivel-card.oro::before    { background: var(--oro); }
+    .nivel-card.esmeralda::before { background: var(--green); }
+
+    .nivel-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 5px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .nivel-tag.bronce   { background: #f5ebe0; color: var(--bronce); }
+    .nivel-tag.plata    { background: #f0f0f0; color: var(--plata); }
+    .nivel-tag.oro      { background: #fef9e7; color: var(--oro); }
+    .nivel-tag.esmeralda { background: var(--green-light); color: var(--green); }
+
+    .nivel-nombre {
+      font-weight: 800;
+      font-size: 1.05rem;
+      margin-bottom: 4px;
+    }
+
+    .nivel-retiros {
+      font-size: 0.8rem;
+      color: var(--gray-dark);
+      margin-bottom: 14px;
+    }
+
+    .nivel-lista {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nivel-lista li {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+    }
+
+    .nivel-lista li::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+
+    /* BENEFICIOS GRID */
+    .beneficios-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .beneficio-card {
+      background: white;
+      border: 1.5px solid var(--gray-light);
+      border-radius: var(--radius-lg);
+      padding: 26px 22px;
+      position: relative;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+
+    .beneficio-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--accent);
+    }
+
+    .beneficio-card.destacado {
+      background: linear-gradient(135deg, var(--green-light) 0%, #f0faf5 100%);
+      border-color: var(--green-mid);
+    }
+
+    .beneficio-tag-provi {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: #1a3a6b;
+      color: white;
+      border-radius: 4px;
+      padding: 3px 7px;
+    }
+
+    .beneficio-cat {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
+
+    .cat-municipal  { background: #e8f0fd; color: #1a3a6b; }
+    .cat-descuento  { background: #fef9e7; color: #8a6000; }
+    .cat-ecokit     { background: var(--green-light); color: var(--green); }
+    .cat-cultura    { background: #fde8f5; color: #6b1a5b; }
+    .cat-salud      { background: #fde8e8; color: #6b1a1a; }
+
+    .beneficio-nombre {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 6px;
+      line-height: 1.3;
+      padding-right: 50px;
+    }
+
+    .beneficio-desc {
+      font-size: 0.855rem;
+      color: var(--text-soft);
+      margin-bottom: 14px;
+      line-height: 1.55;
+    }
+
+    .beneficio-desde {
+      font-size: 0.78rem;
+      color: var(--green);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nivel-pill {
+      background: var(--green-light);
+      border-radius: 20px;
+      padding: 2px 8px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .nivel-pill.bronce  { background: #f5ebe0; color: var(--bronce); }
+    .nivel-pill.plata   { background: #f0f0f0; color: var(--plata); }
+    .nivel-pill.oro     { background: #fef9e7; color: var(--oro); }
+    .nivel-pill.esmeralda { background: var(--green-light); color: var(--green); }
+
+    /* PROGRESO */
+    .progreso-panel {
+      background: white;
+      border: 1.5px solid var(--gray-light);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      max-width: 640px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .progreso-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .progreso-nivel-info h3 {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .progreso-nivel-info p {
+      font-size: 0.82rem;
+      color: var(--gray-dark);
+    }
+
+    .barra-progreso-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      margin-bottom: 8px;
+    }
+
+    .barra-progreso-label span:last-child {
+      font-weight: 600;
+      color: var(--green);
+    }
+
+    .barra-track {
+      background: var(--gray-light);
+      border-radius: 100px;
+      height: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .barra-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, var(--green), var(--accent));
+    }
+
+    .proximos-lista {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .proximo-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--gray-bg);
+      border-radius: 8px;
+      font-size: 0.875rem;
+    }
+
+    .proximo-nombre { font-weight: 600; }
+    .proximo-faltan { margin-left: auto; font-size: 0.75rem; color: var(--gray-dark); }
+
+    /* PASOS */
+    .pasos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+      counter-reset: paso;
+    }
+
+    .paso-card {
+      background: white;
+      border: 1.5px solid var(--gray-light);
+      border-radius: var(--radius-lg);
+      padding: 26px 22px;
+      position: relative;
+      counter-increment: paso;
+    }
+
+    .paso-card::after {
+      content: counter(paso);
+      position: absolute;
+      top: 18px;
+      right: 20px;
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--gray-light);
+      line-height: 1;
+    }
+
+    .paso-numero {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: var(--green-light);
+      color: var(--green);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .paso-titulo {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+    }
+
+    .paso-texto {
+      font-size: 0.845rem;
+      color: var(--text-soft);
+      line-height: 1.55;
+    }
+
+    /* BANNER */
+    .banner-tarjeta {
+      background: linear-gradient(135deg, #1a3a6b 0%, #2b5ba8 100%);
+      color: white;
+      border-radius: var(--radius-lg);
+      padding: 36px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .banner-tarjeta h2 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .banner-tarjeta p {
+      opacity: 0.82;
+      font-size: 0.9rem;
+      max-width: 480px;
+      line-height: 1.6;
+    }
+
+    .btn-tarjeta {
+      background: white;
+      color: #1a3a6b;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-weight: 700;
+      font-family: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-block;
+      transition: opacity 0.15s;
+    }
+
+    .btn-tarjeta:hover { opacity: 0.88; }
+
+    .nota-legal {
+      background: var(--green-light);
+      border: 1px solid #b2d8bf;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.82rem;
+      color: #1a4731;
+      line-height: 1.55;
+    }
+
+    .section-bene {
+      max-width: 1020px;
+      margin: 0 auto;
+      padding: 52px 28px;
+    }
+
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .section-title-bene {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+
+    .section-desc {
+      color: var(--gray-dark);
+      max-width: 620px;
+      margin-bottom: 36px;
+      font-size: 0.93rem;
+      line-height: 1.65;
+    }
+
+    @media (max-width: 640px) {
+      .beneficios-hero h1 { font-size: 1.7rem; }
+      .niveles-grid { grid-template-columns: 1fr 1fr; }
+      .banner-tarjeta { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">RR</div>
+    ReciRetiro Smart
+  </a>
+  <div class="nav-links">
+    <a href="register.html">Registrarse</a>
+    <a href="scan.html">Escanear QR</a>
+    <a href="beneficios.html">Beneficios</a>
+    <a href="mapa.html">Puntos limpios</a>
+    <a href="dashboard.html">Panel Municipal</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="beneficios-hero">
+  <div class="beneficios-hero-inner">
+    <div class="hero-label">Municipalidad de Providencia</div>
+    <h1 style="margin-top: 12px;">Recicla más,<br><span>obtén más.</span></h1>
+    <p>Cada retiro confirmado suma hacia tu nivel de participación. La Municipalidad de Providencia recompensa tu compromiso con beneficios reales: descuentos, kits, actividades y acceso prioritario a programas municipales.</p>
+    <div class="hero-stats-row">
+      <div class="hero-stat-pill">
+        <strong>4</strong>
+        <span>Niveles de beneficios</span>
+      </div>
+      <div class="hero-stat-pill">
+        <strong>9+</strong>
+        <span>Beneficios disponibles</span>
+      </div>
+      <div class="hero-stat-pill">
+        <strong>$0</strong>
+        <span>Costo para el vecino</span>
+      </div>
+      <div class="hero-stat-pill">
+        <strong>Activo</strong>
+        <span>Integrado con Tarjeta Vecino</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NIVELES -->
+<div class="section-bene">
+  <p class="section-label">Sistema de niveles</p>
+  <h2 class="section-title-bene">Cuatro niveles, beneficios crecientes</h2>
+  <p class="section-desc">Tu nivel se calcula automáticamente según los retiros confirmados en los últimos 6 meses. Si bajas de actividad puedes recuperarlo reciclando más.</p>
+
+  <div class="niveles-grid">
+    <div class="nivel-card bronce">
+      <div class="nivel-tag bronce">Bronce</div>
+      <div class="nivel-nombre">Nivel Bronce</div>
+      <div class="nivel-retiros">1 a 4 retiros en 6 meses</div>
+      <ul class="nivel-lista">
+        <li>Historial digital en panel personal</li>
+        <li>Estimación de CO2 evitado</li>
+        <li>Recordatorio por WhatsApp</li>
+        <li>Acceso al mapa de puntos limpios</li>
+      </ul>
+    </div>
+    <div class="nivel-card plata">
+      <div class="nivel-tag plata">Plata</div>
+      <div class="nivel-nombre">Nivel Plata</div>
+      <div class="nivel-retiros">5 a 11 retiros en 6 meses</div>
+      <ul class="nivel-lista">
+        <li>Todo lo anterior</li>
+        <li>Kit vermicompostera domiciliaria</li>
+        <li>Inscripción prioritaria talleres Medio Ambiente</li>
+        <li>Certificado digital de reciclador</li>
+      </ul>
+    </div>
+    <div class="nivel-card oro">
+      <div class="nivel-tag oro">Oro</div>
+      <div class="nivel-nombre">Nivel Oro</div>
+      <div class="nivel-retiros">12 a 23 retiros en 6 meses</div>
+      <ul class="nivel-lista">
+        <li>Todo lo anterior</li>
+        <li>Descuento combustible Petrobras</li>
+        <li>Entradas gratuitas eventos culturales</li>
+        <li>Prioridad en programa Provisalud</li>
+        <li>Mención en ranking comunal</li>
+      </ul>
+    </div>
+    <div class="nivel-card esmeralda">
+      <div class="nivel-tag esmeralda">Esmeralda</div>
+      <div class="nivel-nombre">Nivel Esmeralda</div>
+      <div class="nivel-retiros">24 o más retiros en 6 meses</div>
+      <ul class="nivel-lista">
+        <li>Todo lo anterior</li>
+        <li>Exención parcial derecho de aseo</li>
+        <li>Acceso preferencial Plaza Persa Providencia</li>
+        <li>Reconocimiento público anual</li>
+        <li>Invitación al Consejo Ambiental Vecinal</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="nota-legal">
+    Los beneficios marcados con exención de aseo y cupos requieren aprobación municipal y disponibilidad. Los niveles se actualizan el primer día de cada mes en base a los retiros del semestre anterior.
+  </div>
+</div>
+
+<hr class="divider" style="max-width: 964px; margin: 0 auto;">
+
+<!-- CATÁLOGO DE BENEFICIOS -->
+<div class="section-bene">
+  <p class="section-label">Catálogo de beneficios</p>
+  <h2 class="section-title-bene">Lo que puedes desbloquear</h2>
+  <p class="section-desc">Todos los beneficios son gestionados por la Municipalidad de Providencia. Se activan automáticamente en tu Tarjeta Vecino según tu nivel.</p>
+
+  <div class="beneficios-grid">
+    <div class="beneficio-card destacado">
+      <span class="beneficio-tag-provi">Providencia</span>
+      <span class="beneficio-cat cat-ecokit">Eco-kit</span>
+      <div class="beneficio-nombre">Kit Vermicompostera Domiciliaria</div>
+      <div class="beneficio-desc">Vermicompostera de 22L con instructivo y kilo inicial de tierra más lombrices. El mismo kit entregado a más de 7.000 familias de Providencia.</div>
+      <div class="beneficio-desde">Desde nivel <span class="nivel-pill plata">Plata</span></div>
+    </div>
+
+    <div class="beneficio-card">
+      <span class="beneficio-tag-provi">Providencia</span>
+      <span class="beneficio-cat cat-descuento">Descuento</span>
+      <div class="beneficio-nombre">Descuento combustible Petrobras</div>
+      <div class="beneficio-desc">$15 por litro en gasolina y diésel en estaciones Petrobras de Eliodoro Yáñez 921 y Bilbao 1482. $20 adicionales por litro para vecinos mayores de 60 años. Válido lunes y martes.</div>
+      <div class="beneficio-desde">Desde nivel <span class="nivel-pill oro">Oro</span></div>
+    </div>
+
+    <div class="beneficio-card">
+      <span class="beneficio-tag-provi">Providencia</span>
+      <span class="beneficio-cat cat-cultura">Cultura</span>
+      <div class="beneficio-nombre">Entradas gratuitas eventos culturales</div>
+      <div class="beneficio-desc">2 entradas mensuales para actividades culturales del municipio: conciertos en parques, obras en teatros municipales y talleres artísticos con cupo limitado.</div>
+      <div class="beneficio-desde">Desde nivel <span class="nivel-pill oro">Oro</span></div>
+    </div>
+
+    <div class="beneficio-card">
+      <span class="beneficio-tag-provi">Providencia</span>
+      <span class="beneficio-cat cat-municipal">Municipal</span>
+      <div class="beneficio-nombre">Inscripción prioritaria talleres DAOM</div>
+      <div class="beneficio-desc">Acceso anticipado 48 horas a la lista de inscripción de talleres de medio ambiente, compostaje y economía circular organizados por la Dirección de Aseo y Ornato.</div>
+      <div class="beneficio-desde">Desde nivel <span class="nivel-pill plata">Plata</span></div>
+    </div>
+
+    <div class="beneficio-card">
+      <span class="beneficio-tag-provi">Providencia</span>
+      <span class="beneficio-cat cat-salud">Salud</span>
+      <div class="beneficio-nombre">Acceso prioritario Provisalud</div>
+      <div class="beneficio-desc">Cola preferencial en la farmacia comunal Provisalud con precios reducidos para medicamentos esenciales. Tu Tarjeta Vecino activa el beneficio.</div>
+      <div class="beneficio-desde">Desde nivel <span class="nivel-pill oro">Oro</span></div>
+    </div>
+
+    <div class="beneficio-card">
+      <span class="beneficio-tag-provi">Providencia</span>
+      <span class="beneficio-cat cat-ecokit">Eco-kit</span>
+      <div class="beneficio-nombre">Certificado digital de reciclador</div>
+      <div class="beneficio-desc">Certificado PDF con código QR verificable que acredita tu participación activa en el programa municipal. Útil para colegios, empresas y compromisos de sostenibilidad.</div>
+      <div class="beneficio-desde">Desde nivel <span class="nivel-pill plata">Plata</span></div>
+    </div>
+
+    <div class="beneficio-card destacado">
+      <span class="beneficio-tag-provi">Providencia</span>
+      <span class="beneficio-cat cat-municipal">Municipal</span>
+      <div class="beneficio-nombre">Exención parcial derecho de aseo</div>
+      <div class="beneficio-desc">Los vecinos Esmeralda pueden solicitar una reducción en el derecho de aseo municipal en reconocimiento a su reducción efectiva de residuos no reciclables. Sujeto a disponibilidad y resolución anual.</div>
+      <div class="beneficio-desde">Desde nivel <span class="nivel-pill esmeralda">Esmeralda</span></div>
+    </div>
+
+    <div class="beneficio-card">
+      <span class="beneficio-tag-provi">Providencia</span>
+      <span class="beneficio-cat cat-cultura">Cultura</span>
+      <div class="beneficio-nombre">Reconocimiento público anual</div>
+      <div class="beneficio-desc">Los 20 vecinos con más retiros anuales en Providencia son reconocidos en ceremonia pública y mención en el sitio web municipal durante el Día del Reciclaje (17 de mayo).</div>
+      <div class="beneficio-desde">Desde nivel <span class="nivel-pill esmeralda">Esmeralda</span></div>
+    </div>
+
+    <div class="beneficio-card">
+      <span class="beneficio-tag-provi">Providencia</span>
+      <span class="beneficio-cat cat-municipal">Municipal</span>
+      <div class="beneficio-nombre">Consejo Ambiental Vecinal</div>
+      <div class="beneficio-desc">Invitación a participar en el Consejo Ambiental Vecinal de Providencia: instancia de co-diseño de políticas de reciclaje con el equipo de Medio Ambiente del municipio.</div>
+      <div class="beneficio-desde">Desde nivel <span class="nivel-pill esmeralda">Esmeralda</span></div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider" style="max-width: 964px; margin: 0 auto;">
+
+<!-- PANEL DE PROGRESO (demo estático) -->
+<div class="section-bene">
+  <p class="section-label">Tu progreso</p>
+  <h2 class="section-title-bene">Así se ve tu panel de beneficios</h2>
+  <p class="section-desc">Cada vecino registrado en ReciRetiro Smart tiene acceso a esta vista dentro de su panel personal, con datos reales de Supabase.</p>
+
+  <div class="progreso-panel">
+    <div class="progreso-header">
+      <div class="progreso-nivel-info">
+        <div class="nivel-tag plata" style="margin-bottom:8px;">Plata</div>
+        <h3>Nivel Plata</h3>
+        <p>7 retiros en los últimos 6 meses</p>
+      </div>
+      <a href="panel.html" class="btn btn-primary">Ver mi panel</a>
+    </div>
+
+    <div class="barra-progreso-label">
+      <span>Progreso hacia nivel Oro</span>
+      <span>7 / 12 retiros</span>
+    </div>
+    <div class="barra-track">
+      <div class="barra-fill" style="width: 58.3%"></div>
+    </div>
+
+    <p style="font-size:0.82rem; color:var(--gray-dark); margin-bottom:16px;">
+      Faltan <strong style="color:var(--text);">5 retiros</strong> para desbloquear el nivel Oro y acceder a:
+    </p>
+
+    <div class="proximos-lista">
+      <div class="proximo-item">
+        <span class="proximo-nombre">Descuento combustible Petrobras</span>
+        <span class="proximo-faltan">5 retiros</span>
+      </div>
+      <div class="proximo-item">
+        <span class="proximo-nombre">Entradas gratuitas eventos culturales</span>
+        <span class="proximo-faltan">5 retiros</span>
+      </div>
+      <div class="proximo-item">
+        <span class="proximo-nombre">Acceso prioritario Provisalud</span>
+        <span class="proximo-faltan">5 retiros</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider" style="max-width: 964px; margin: 0 auto;">
+
+<!-- CÓMO ACTIVAR -->
+<div class="section-bene">
+  <p class="section-label">Activación</p>
+  <h2 class="section-title-bene">Cómo activar tus beneficios</h2>
+  <p class="section-desc">El sistema conecta ReciRetiro Smart con la Tarjeta Vecino Soy Providencia. Solo necesitas completar cuatro pasos una sola vez.</p>
+
+  <div class="pasos-grid">
+    <div class="paso-card">
+      <div class="paso-numero">1</div>
+      <div class="paso-titulo">Regístrate en ReciRetiro</div>
+      <div class="paso-texto">Completa el formulario de registro. Recibes tu código QR único vinculado a tu domicilio.</div>
+    </div>
+    <div class="paso-card">
+      <div class="paso-numero">2</div>
+      <div class="paso-titulo">Pega el QR en tu contenedor</div>
+      <div class="paso-texto">Imprime el código QR y pégalo en el recipiente que dejas en la acera el día de reciclaje.</div>
+    </div>
+    <div class="paso-card">
+      <div class="paso-numero">3</div>
+      <div class="paso-titulo">Vincula tu Tarjeta Vecino</div>
+      <div class="paso-texto">En tu panel personal ingresa tu RUT de Tarjeta Vecino. El sistema verifica y vincula los beneficios.</div>
+    </div>
+    <div class="paso-card">
+      <div class="paso-numero">4</div>
+      <div class="paso-titulo">Los beneficios se activan solos</div>
+      <div class="paso-texto">Al alcanzar el nivel requerido, el sistema notifica a la municipalidad y tus beneficios se activan en tu Tarjeta Vecino automáticamente.</div>
+    </div>
+  </div>
+</div>
+
+<!-- BANNER TARJETA VECINO -->
+<div class="section-bene" style="padding-top: 0;">
+  <div class="banner-tarjeta">
+    <div>
+      <h2>¿Aún no tienes la Tarjeta Vecino?</h2>
+      <p>La Tarjeta Vecino Soy Providencia es gratuita para todos los residentes de la comuna mayores de 18 años. Se tramita en línea en menos de 5 minutos. Es el nexo que activa los beneficios de reciclaje.</p>
+    </div>
+    <a href="https://providencia.cl/provi/municipalidad/servicios/desarrollo-comunitario/tarjeta-vecino-providencia" target="_blank" rel="noopener" class="btn-tarjeta">
+      Solicitar Tarjeta Vecino
+    </a>
+  </div>
+</div>
+
+<footer>
+  ReciRetiro Smart &nbsp;&middot;&nbsp; Municipalidad de Providencia &nbsp;&middot;&nbsp; Sistema de trazabilidad de reciclaje domiciliario
+</footer>
+
+</body>
+</html>
