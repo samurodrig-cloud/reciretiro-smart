@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel del Vecino — ReciRetiro Smart</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 768px) { .panel-grid { grid-template-columns: 1fr; } }
+  </style>
 </head>
 <body>
 
@@ -30,11 +34,11 @@
 <div id="content" style="display:none;">
   <div class="container">
 
-    <div class="reminder-box" style="margin-bottom: 24px;">
-      <p><strong>Recordatorio:</strong> mañana se realizará el retiro de tu reciclaje entre las 09:00 y las 13:00 hrs. Por favor deja tu reciclaje junto al contenedor con el código QR visible.</p>
+    <div id="reminder-box" class="reminder-box" style="display:none; margin-bottom: 24px;">
+      <p>♻️ <strong>Recordatorio:</strong> mañana es tu día de retiro (09:00–13:00 hrs). Deja tu reciclaje junto al basurero con el QR 1 visible.</p>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+    <div class="panel-grid">
 
       <div>
         <div class="card">
@@ -115,11 +119,11 @@
 
     </div>
 
-    <!-- MIS BENEFICIOS -->
+    <!-- MIS BENEFICIOS (resumen) -->
     <div class="card" id="beneficios-card">
       <div class="section-header">
         <h2>Mis beneficios</h2>
-        <a href="beneficios.html" class="btn btn-outline" style="padding:5px 12px; font-size:0.8rem;">Ver catálogo</a>
+        <a id="perfil-beneficios-link" href="#" class="btn btn-primary" style="padding:5px 14px; font-size:0.82rem;">Ver perfil completo →</a>
       </div>
       <div id="beneficios-content">
         <div class="loading"><div class="spinner"></div></div>
@@ -219,6 +223,11 @@
     document.getElementById('next-date').textContent = getNextPickupDate(neighbor.preferred_day);
     document.getElementById('resident-code').textContent = neighbor.code;
     document.getElementById('perfil-link').href = 'perfil.html?code=' + neighbor.code;
+    document.getElementById('perfil-beneficios-link').href = 'perfil.html?code=' + neighbor.code;
+
+    if (isTomorrowPickupDay(neighbor.preferred_day)) {
+      document.getElementById('reminder-box').style.display = 'flex';
+    }
 
     const totalPickups = pickups ? pickups.length : 0;
     const totalBags = pickups ? pickups.reduce((s, p) => s + (p.bags || 1), 0) : 0;
@@ -279,11 +288,18 @@
     if (e.key === 'Enter' && input && document.activeElement === input) searchPanel();
   });
 
+  function isTomorrowPickupDay(preferredDay) {
+    const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return days[tomorrow.getDay()] === preferredDay;
+  }
+
   const NIVELES = [
-    { nombre: 'Bronce',    min: 1,  max: 4,  color: '#a0632a', bg: '#f5ebe0' },
-    { nombre: 'Plata',     min: 5,  max: 11, color: '#707070', bg: '#f0f0f0' },
-    { nombre: 'Oro',       min: 12, max: 23, color: '#b8860b', bg: '#fef9e7' },
-    { nombre: 'Esmeralda', min: 24, max: Infinity, color: '#1e5f3f', bg: '#e8f2ec' }
+    { nombre: 'Bronce',    min: 1,  max: 4,  color: '#a0632a', bg: '#f5ebe0', emoji: '♻️' },
+    { nombre: 'Plata',     min: 5,  max: 11, color: '#707070', bg: '#f0f0f0', emoji: '🌿' },
+    { nombre: 'Oro',       min: 12, max: 23, color: '#b8860b', bg: '#fef9e7', emoji: '⭐' },
+    { nombre: 'Esmeralda', min: 24, max: Infinity, color: '#1e5f3f', bg: '#e8f2ec', emoji: '💎' }
   ];
 
   function calcularNivel(retiros) {
@@ -303,80 +319,36 @@
   async function renderBeneficios(neighborCode) {
     const seisM = new Date();
     seisM.setMonth(seisM.getMonth() - 6);
-
     const { data: pickups6m } = await db.from('pickups')
-      .select('id')
-      .eq('neighbor_code', neighborCode)
-      .gte('created_at', seisM.toISOString());
+      .select('id').eq('neighbor_code', neighborCode).gte('created_at', seisM.toISOString());
 
     const retiros = pickups6m ? pickups6m.length : 0;
-    const nivel = calcularNivel(retiros);
+    const nivel   = calcularNivel(retiros);
     const proximo = proximoNivel(retiros);
-    const pct = proximo ? Math.min(100, Math.round(((retiros - (proximo.meta - proximo.falta - (proximo.nombre === 'Plata' ? 1 : proximo.nombre === 'Oro' ? 5 : 12))) / (proximo.falta + 1)) * 100)) : 100;
-    const pctBar = proximo
-      ? Math.round((retiros / proximo.meta) * 100)
-      : 100;
-
-    const beneficiosActivos = {
-      Bronce:    ['Historial digital en panel personal', 'Estimacion de CO2 evitado', 'Recordatorio por WhatsApp', 'Acceso al mapa de puntos limpios'],
-      Plata:     ['Kit vermicompostera domiciliaria', 'Inscripcion prioritaria talleres DAOM', 'Certificado digital de reciclador'],
-      Oro:       ['Descuento combustible Petrobras ($15/litro)', 'Entradas gratuitas eventos culturales', 'Acceso prioritario Provisalud', 'Mencion ranking comunal'],
-      Esmeralda: ['Exencion parcial derecho de aseo', 'Acceso preferencial Plaza Persa', 'Reconocimiento publico anual', 'Consejo Ambiental Vecinal']
-    };
-
-    const niveles = ['Bronce', 'Plata', 'Oro', 'Esmeralda'];
-    const idxActual = niveles.indexOf(nivel.nombre);
-    let beneficiosDesbloqueados = [];
-    for (let i = 0; i <= idxActual; i++) {
-      beneficiosDesbloqueados = beneficiosDesbloqueados.concat(beneficiosActivos[niveles[i]]);
-    }
+    const pctBar  = proximo ? Math.round((retiros / proximo.meta) * 100) : 100;
 
     let html = `
-      <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap;">
-        <div style="background:${nivel.bg}; color:${nivel.color}; padding:4px 14px; border-radius:5px; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;">${nivel.nombre}</div>
-        <span style="font-size:0.88rem; color:var(--gray-dark);">${retiros} retiro${retiros !== 1 ? 's' : ''} en los ultimos 6 meses</span>
+      <div style="display:flex; align-items:center; gap:14px; padding:16px 18px; background:${nivel.bg}; border-radius:10px; border:1.5px solid ${nivel.color}25; margin-bottom:16px;">
+        <span style="font-size:1.5rem;">${nivel.emoji}</span>
+        <div style="flex:1;">
+          <div style="font-weight:700; color:${nivel.color}; font-size:0.92rem;">Nivel ${nivel.nombre}</div>
+          <div style="font-size:0.8rem; color:var(--gray-dark); margin-top:2px;">${retiros} retiro${retiros !== 1 ? 's' : ''} en los últimos 6 meses</div>
+        </div>
       </div>`;
 
     if (proximo) {
+      const faltan = proximo.falta;
       html += `
-      <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:6px;">
-        <span style="color:var(--gray-dark);">Progreso hacia nivel ${proximo.nombre}</span>
-        <span style="font-weight:600; color:var(--green);">${retiros} / ${proximo.meta} retiros</span>
+      <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:6px; color:var(--gray-dark);">
+        <span>Hacia nivel ${proximo.nombre}</span>
+        <span style="font-weight:600; color:var(--green);">${retiros} / ${proximo.meta}</span>
       </div>
-      <div style="height:7px; background:var(--gray-light); border-radius:100px; overflow:hidden; margin-bottom:16px;">
-        <div style="height:100%; width:${pctBar}%; background:linear-gradient(90deg,var(--green),var(--accent)); border-radius:100px;"></div>
+      <div style="height:8px; background:var(--gray-light); border-radius:100px; overflow:hidden; margin-bottom:12px;">
+        <div style="height:100%; width:${pctBar}%; background:linear-gradient(90deg,var(--green),var(--accent)); border-radius:100px; transition:width 0.8s ease;"></div>
       </div>
-      <p style="font-size:0.82rem; color:var(--gray-dark); margin-bottom:16px;">Faltan <strong style="color:var(--text);">${proximo.falta} retiro${proximo.falta !== 1 ? 's' : ''}</strong> para alcanzar el nivel ${proximo.nombre}.</p>`;
+      <p style="font-size:0.82rem; color:var(--gray-dark);">Faltan <strong style="color:var(--text);">${faltan} retiro${faltan !== 1 ? 's' : ''}</strong> para desbloquear beneficios de nivel ${proximo.nombre}.</p>`;
     } else {
-      html += `<div class="alert alert-success" style="margin-bottom:16px;">Has alcanzado el nivel maximo: Esmeralda.</div>`;
-    }
-
-    html += `
-      <p style="font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--gray-dark); margin-bottom:10px;">Beneficios activos</p>
-      <div style="display:flex; flex-direction:column; gap:7px;">
-        ${beneficiosDesbloqueados.map(b => `
-          <div style="display:flex; align-items:center; gap:10px; padding:9px 12px; background:var(--green-light); border-radius:7px; font-size:0.845rem;">
-            <div style="width:6px; height:6px; background:var(--green); border-radius:50%; flex-shrink:0;"></div>
-            ${b}
-          </div>`).join('')}
-      </div>`;
-
-    if (proximo) {
-      const siguientes = beneficiosActivos[proximo.nombre] || [];
-      if (siguientes.length > 0) {
-        html += `
-        <p style="font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--gray-dark); margin:16px 0 10px;">Proximos beneficios (nivel ${proximo.nombre})</p>
-        <div style="display:flex; flex-direction:column; gap:7px;">
-          ${siguientes.map(b => `
-            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 12px; background:var(--gray-bg); border-radius:7px; font-size:0.845rem;">
-              <div style="display:flex; align-items:center; gap:10px;">
-                <div style="width:6px; height:6px; background:var(--gray-mid); border-radius:50%; flex-shrink:0;"></div>
-                <span style="color:var(--gray-dark);">${b}</span>
-              </div>
-              <span style="font-size:0.75rem; color:var(--gray-dark); flex-shrink:0;">${proximo.falta} retiros</span>
-            </div>`).join('')}
-        </div>`;
-      }
+      html += `<div class="alert alert-success">Nivel máximo alcanzado: Esmeralda 💎</div>`;
     }
 
     document.getElementById('beneficios-content').innerHTML = html;

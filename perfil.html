@@ -209,6 +209,9 @@
     <div class="perfil-name" id="perfil-name"></div>
     <div class="perfil-code" id="perfil-code"></div>
     <div class="perfil-sector" id="perfil-sector"></div>
+    <button onclick="copyPerfilLink()" id="copy-btn" style="position:relative; z-index:1; margin-top:18px; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.25); color:white; padding:8px 20px; border-radius:8px; font-size:0.8rem; font-weight:600; cursor:pointer; font-family:inherit; transition:background 0.15s; letter-spacing:0.01em;">
+      📋 Copiar link de mi perfil
+    </button>
   </div>
 
   <div class="container">
@@ -400,7 +403,24 @@
     // PROGRESS
     const nextNombre = nivelCfg.next ? calcularNivel(nivelCfg.next) : null;
     document.getElementById('progress-card').style.display = 'block';
-    if (nextNombre) {
+    if (totalRetiros === 0) {
+      document.getElementById('progress-content').innerHTML = `
+        <div style="display:flex; align-items:center; gap:14px; padding:16px 20px; background:var(--green-light); border-radius:10px; margin-bottom:14px;">
+          <span style="font-size:1.8rem;">🌱</span>
+          <div>
+            <div style="font-weight:700; color:var(--green); margin-bottom:3px;">¡Tu historia recicladora comienza aquí!</div>
+            <div style="font-size:0.85rem; color:var(--gray-dark); line-height:1.55;">
+              Completa tu primer retiro para ganar puntos y desbloquear beneficios de Providencia.
+              Faltan <strong>5 retiros</strong> en 6 meses para alcanzar el nivel Plata 🌿.
+            </div>
+          </div>
+        </div>
+        <div style="height:12px; background:var(--gray-light); border-radius:100px; overflow:hidden;">
+          <div style="height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--green)); border-radius:100px;"></div>
+        </div>
+        <p style="font-size:0.78rem; color:var(--gray-dark); margin-top:8px; text-align:right;">0 / 5 retiros</p>
+      `;
+    } else if (nextNombre) {
       const nextCfg = NIVELES_CONFIG[nextNombre];
       const meta     = nivelCfg.next;
       const pct      = Math.min(100, Math.round((retiros6m / meta) * 100));
@@ -488,6 +508,21 @@
       text: qr2Url, width: 160, height: 160,
       colorDark: '#1a4a7a', colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.H
+    });
+  }
+
+  function copyPerfilLink() {
+    const url = window.location.href;
+    const btn = document.getElementById('copy-btn');
+    navigator.clipboard.writeText(url).then(() => {
+      btn.textContent = '✓ Link copiado';
+      btn.style.background = 'rgba(255,255,255,0.25)';
+      setTimeout(() => {
+        btn.textContent = '📋 Copiar link de mi perfil';
+        btn.style.background = 'rgba(255,255,255,0.12)';
+      }, 2500);
+    }).catch(() => {
+      prompt('Copia este link para compartir tu perfil:', url);
     });
   }
 
