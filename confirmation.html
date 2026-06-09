@@ -5,6 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registro Exitoso — ReciRetiro Smart</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .qr-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .qr-panel {
+      text-align: center;
+      padding: 22px 16px;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid var(--gray-light);
+    }
+    .qr-panel-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 5px;
+      margin-bottom: 8px;
+    }
+    .qr-panel-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+    .qr-panel-desc {
+      font-size: 0.76rem;
+      color: var(--gray-dark);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+    @media (max-width: 580px) {
+      .qr-pair { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
 
@@ -29,27 +68,72 @@
   </div>
 
   <div id="content" style="display:none;">
+
     <div class="alert alert-success" style="margin-top: 16px;">
-      Registro exitoso. Tu código QR ha sido generado correctamente.
+      ¡Registro exitoso! Tu solicitud fue recibida por la Municipalidad de Providencia.
     </div>
 
+    <!-- NEXT STEPS -->
+    <div class="card" style="background: var(--green-dark); border: none;">
+      <h2 style="font-size: 1rem; font-weight: 700; color: white; margin-bottom: 14px;">¿Qué pasa ahora?</h2>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="display:flex; align-items:flex-start; gap:12px;">
+          <div style="width:26px; height:26px; background:rgba(255,255,255,0.15); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; color:white; flex-shrink:0; margin-top:1px;">1</div>
+          <div style="font-size:0.83rem; color:rgba(255,255,255,0.8); line-height:1.55;">
+            <strong style="color:white;">La municipalidad coordinará la entrega</strong> de tu basurero de reciclaje con los dos códigos QR impresos.
+          </div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:12px;">
+          <div style="width:26px; height:26px; background:rgba(255,255,255,0.15); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; color:white; flex-shrink:0; margin-top:1px;">2</div>
+          <div style="font-size:0.83rem; color:rgba(255,255,255,0.8); line-height:1.55;">
+            <strong style="color:white;">El QR 1</strong> (verde) lo usará el recolector para registrar cada retiro automáticamente.
+          </div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:12px;">
+          <div style="width:26px; height:26px; background:rgba(255,255,255,0.15); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; color:white; flex-shrink:0; margin-top:1px;">3</div>
+          <div style="font-size:0.83rem; color:rgba(255,255,255,0.8); line-height:1.55;">
+            <strong style="color:white;">El QR 2</strong> (azul) permite ver tu nivel, puntos y beneficios desde cualquier dispositivo.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CÓDIGO -->
     <div class="card" style="text-align: center;">
-      <p style="font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-dark); margin-bottom: 6px;">Tu código único</p>
-      <div id="resident-code" style="font-size: 1.9rem; font-weight: 800; color: var(--text); margin-bottom: 24px; letter-spacing: 2px; font-family: 'Courier New', monospace;"></div>
+      <p style="font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-dark); margin-bottom: 5px;">Tu código único</p>
+      <div id="resident-code" style="font-size: 1.9rem; font-weight: 800; color: var(--text); margin-bottom: 6px; letter-spacing: 2px; font-family: 'Courier New', monospace;"></div>
+      <p style="font-size: 0.8rem; color: var(--gray-dark); margin-bottom: 24px;">Guárdalo — te servirá para acceder a tu panel en cualquier momento.</p>
 
-      <div class="qr-box" style="margin-bottom: 20px;">
-        <div id="qr-code" style="display: inline-block;"></div>
+      <!-- DOS QR -->
+      <div class="qr-pair">
+        <div class="qr-panel" style="background:#f4f9f6;">
+          <div class="qr-panel-badge" style="background:var(--green-light); color:var(--green);">QR 1 — Recolector</div>
+          <div class="qr-panel-title">Para el camión municipal</div>
+          <div class="qr-panel-desc">El recolector escanea este QR en cada retiro para registrar tu participación.</div>
+          <div id="qr1-code" style="display:inline-block; margin-bottom:12px;"></div>
+          <br>
+          <button onclick="downloadQR('qr1-code', 'QR1-Recolector')" class="btn btn-outline" style="font-size:0.78rem; padding:7px 14px;">
+            Descargar QR 1
+          </button>
+        </div>
+        <div class="qr-panel" style="background:#eaf1fa;">
+          <div class="qr-panel-badge" style="background:var(--blue-light); color:var(--blue);">QR 2 — Perfil Público</div>
+          <div class="qr-panel-title">Para ver tu progreso</div>
+          <div class="qr-panel-desc">Tú o cualquier persona puede escanearlo para ver tu nivel y cuánto has reciclado.</div>
+          <div id="qr2-code" style="display:inline-block; margin-bottom:12px;"></div>
+          <br>
+          <button onclick="downloadQR('qr2-code', 'QR2-Perfil')" class="btn btn-outline" style="font-size:0.78rem; padding:7px 14px; border-color:var(--blue); color:var(--blue);">
+            Descargar QR 2
+          </button>
+        </div>
       </div>
 
-      <div class="alert alert-info" style="text-align: left;">
-        Imprime o guarda este código QR y pégalo en tu contenedor de reciclaje. El recolector lo escaneará en cada retiro.
-      </div>
-
-      <button onclick="downloadQR()" class="btn btn-outline btn-full" style="margin-top: 8px;">
-        Descargar código QR
-      </button>
+      <p style="font-size:0.78rem; color:var(--gray-dark); line-height:1.55;">
+        Estos QR vienen impresos en tu basurero. Puedes descargarlos ahora como respaldo.
+      </p>
     </div>
 
+    <!-- DETALLES -->
     <div class="card">
       <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 16px; color: var(--text);">Detalles de tu registro</h3>
       <div id="neighbor-details"></div>
@@ -66,8 +150,9 @@
 
     <div style="display: flex; gap: 12px; flex-wrap: wrap;">
       <a id="panel-link" href="#" class="btn btn-primary btn-lg" style="flex: 1;">Ver mi panel</a>
-      <a href="dashboard.html" class="btn btn-outline btn-lg" style="flex: 1;">Panel municipal</a>
+      <a id="perfil-link" href="#" class="btn btn-outline btn-lg" style="flex: 1;">Ver mi perfil público</a>
     </div>
+
   </div>
 </div>
 
@@ -104,7 +189,8 @@
     document.getElementById('loading').style.display = 'none';
     document.getElementById('content').style.display = 'block';
     document.getElementById('resident-code').textContent = data.code;
-    document.getElementById('panel-link').href = 'panel.html?code=' + data.code;
+    document.getElementById('panel-link').href  = 'panel.html?code='  + data.code;
+    document.getElementById('perfil-link').href = 'perfil.html?code=' + data.code;
     document.getElementById('next-pickup').textContent = getNextPickupDate(data.preferred_day);
 
     document.getElementById('neighbor-details').innerHTML = `
@@ -115,22 +201,26 @@
       <div class="info-row"><span class="info-label">Día preferido</span><span class="info-value">${data.preferred_day}</span></div>
     `;
 
-    const qrUrl = window.location.origin + '/scan.html#pickup/' + data.code;
-    new QRCode(document.getElementById('qr-code'), {
-      text: qrUrl,
-      width: 220,
-      height: 220,
-      colorDark: '#1a4731',
-      colorLight: '#ffffff',
+    const qr1Url = window.location.origin + '/scan.html#pickup/'  + data.code;
+    const qr2Url = window.location.origin + '/perfil.html?code=' + data.code;
+
+    new QRCode(document.getElementById('qr1-code'), {
+      text: qr1Url, width: 180, height: 180,
+      colorDark: '#1a4731', colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+    new QRCode(document.getElementById('qr2-code'), {
+      text: qr2Url, width: 180, height: 180,
+      colorDark: '#1a4a7a', colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.H
     });
   }
 
-  function downloadQR() {
-    const canvas = document.querySelector('#qr-code canvas');
-    if (!canvas) return;
+  function downloadQR(containerId, label) {
+    const canvas = document.querySelector('#' + containerId + ' canvas');
+    if (!canvas) { alert('El QR aún se está generando, intenta en un momento.'); return; }
     const link = document.createElement('a');
-    link.download = 'QR-' + code + '.png';
+    link.download = label + '-' + code + '.png';
     link.href = canvas.toDataURL();
     link.click();
   }

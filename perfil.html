@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Perfil Reciclador — ReciRetiro Smart</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .perfil-hero {
+      color: white;
+      padding: 52px 28px 44px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      background: var(--green-dark);
+    }
+    .perfil-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(58,158,107,0.2) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(30,95,63,0.25) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .perfil-avatar {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.7rem;
+      font-weight: 800;
+      margin: 0 auto 14px;
+      border: 3px solid rgba(255,255,255,0.2);
+      position: relative;
+      z-index: 1;
+    }
+    .nivel-badge-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 18px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+    .perfil-name {
+      font-size: 1.9rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 5px;
+      position: relative;
+      z-index: 1;
+    }
+    .perfil-code {
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.5);
+      position: relative;
+      z-index: 1;
+    }
+    .perfil-sector {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.45);
+      margin-top: 4px;
+      position: relative;
+      z-index: 1;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 24px 0 20px;
+    }
+    .stat-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 20px 16px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--gray-light);
+      border-top: 3px solid var(--accent);
+    }
+    .stat-card-number {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--green);
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+    .stat-card-label {
+      font-size: 0.73rem;
+      color: var(--gray-dark);
+      font-weight: 500;
+      line-height: 1.35;
+    }
+    .benefit-level-card {
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      margin-bottom: 12px;
+      border: 1.5px solid;
+    }
+    .benefit-level-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .benefit-level-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .benefit-level-range {
+      font-size: 0.73rem;
+      font-weight: 500;
+      margin-top: 2px;
+      opacity: 0.75;
+    }
+    .benefit-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 7px;
+      font-size: 0.845rem;
+      margin-bottom: 5px;
+    }
+    .benefit-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .qr-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .qr-panel {
+      text-align: center;
+      padding: 24px 20px;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid var(--gray-light);
+    }
+    .qr-panel-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    .qr-panel-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: var(--text);
+    }
+    .qr-panel-desc {
+      font-size: 0.78rem;
+      color: var(--gray-dark);
+      margin-bottom: 16px;
+      line-height: 1.55;
+    }
+    @media (max-width: 640px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .qr-pair { grid-template-columns: 1fr; }
+      .perfil-name { font-size: 1.45rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">RR</div>
+    ReciRetiro Smart
+  </a>
+  <div class="nav-links">
+    <a href="register.html">Registrarse</a>
+    <a href="beneficios.html">Beneficios</a>
+    <a href="mapa.html">Puntos limpios</a>
+  </div>
+</nav>
+
+<div id="loading" class="loading" style="margin-top: 48px;">
+  <div class="spinner"></div>
+  <p>Cargando perfil...</p>
+</div>
+
+<div id="content" style="display:none;">
+
+  <!-- HERO -->
+  <div class="perfil-hero" id="perfil-hero">
+    <div class="perfil-avatar" id="perfil-avatar"></div>
+    <div class="nivel-badge-hero" id="nivel-badge-hero"></div>
+    <div class="perfil-name" id="perfil-name"></div>
+    <div class="perfil-code" id="perfil-code"></div>
+    <div class="perfil-sector" id="perfil-sector"></div>
+  </div>
+
+  <div class="container">
+
+    <!-- STATS -->
+    <div class="stats-grid" id="stats-grid"></div>
+
+    <!-- PROGRESS -->
+    <div class="card" id="progress-card" style="display:none;">
+      <h2 style="font-size:1rem; font-weight:700; margin-bottom:16px;">Progreso hacia el siguiente nivel</h2>
+      <div id="progress-content"></div>
+    </div>
+
+    <!-- BENEFITS -->
+    <div class="card">
+      <div class="section-header" style="margin-bottom:20px;">
+        <h2>Beneficios del programa</h2>
+        <a href="beneficios.html" class="btn btn-outline" style="padding:5px 12px; font-size:0.8rem;">Ver catálogo</a>
+      </div>
+      <p style="font-size:0.84rem; color:var(--gray-dark); margin-bottom:20px;">Los niveles se calculan en base a los retiros de los últimos 6 meses.</p>
+      <div id="benefits-content"></div>
+    </div>
+
+    <!-- QR CODES -->
+    <div class="card">
+      <h2 style="font-size:1rem; font-weight:700; margin-bottom:5px;">Mis dos códigos QR</h2>
+      <p style="font-size:0.85rem; color:var(--gray-dark); margin-bottom:20px;">
+        Tu basurero tiene estos dos QR impresos. Cada uno cumple una función distinta.
+      </p>
+      <div class="qr-pair">
+        <div class="qr-panel" style="background:#f4f9f6;">
+          <div class="qr-panel-badge" style="background:var(--green-light); color:var(--green);">QR 1 — Recolector</div>
+          <div class="qr-panel-title">Para el camión municipal</div>
+          <div class="qr-panel-desc">El recolector escanea este QR al retirar tu reciclaje. Así se registra cada retiro automáticamente.</div>
+          <div id="qr1-container" style="display:inline-block; margin-bottom:14px;"></div>
+          <br>
+          <button onclick="downloadQR('qr1-container','QR-Recolector')" class="btn btn-outline" style="font-size:0.8rem; padding:7px 16px;">
+            Descargar QR Recolector
+          </button>
+        </div>
+        <div class="qr-panel" style="background:#eaf1fa;">
+          <div class="qr-panel-badge" style="background:var(--blue-light); color:var(--blue);">QR 2 — Perfil Público</div>
+          <div class="qr-panel-title">Para ver tu progreso</div>
+          <div class="qr-panel-desc">Cualquiera que escanee este QR puede ver tu nivel, cuánto has reciclado y tus beneficios activos.</div>
+          <div id="qr2-container" style="display:inline-block; margin-bottom:14px;"></div>
+          <br>
+          <button onclick="downloadQR('qr2-container','QR-Perfil')" class="btn btn-outline" style="font-size:0.8rem; padding:7px 16px; border-color:var(--blue); color:var(--blue);">
+            Descargar QR Perfil
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom: 8px;">
+      <a id="panel-link" href="#" class="btn btn-primary btn-lg" style="flex:1;">Ir a mi panel privado</a>
+      <a href="register.html" class="btn btn-outline btn-lg" style="flex:1;">¿Aún no te registraste?</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- NOT FOUND -->
+<div id="not-found" style="display:none;" class="container-sm">
+  <div class="card" style="margin-top:48px;">
+    <div style="text-align:center; margin-bottom:24px;">
+      <div style="font-size:2.5rem; margin-bottom:12px;">♻️</div>
+      <h2 style="margin-bottom:6px;">Ver perfil reciclador</h2>
+      <p style="color:var(--gray-dark); font-size:0.9rem;">Ingresa tu código único para ver tu perfil y beneficios.</p>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <input type="text" id="search-code" placeholder="Ej: REC-PROV-1842"
+        style="flex:1; padding:10px 14px; border:1.5px solid var(--gray-mid); border-radius:8px; font-size:0.93rem; font-family:inherit; text-transform:uppercase;">
+      <button onclick="searchPerfil()" class="btn btn-primary">Ver perfil</button>
+    </div>
+    <div id="search-error" style="margin-top:12px;"></div>
+    <hr class="divider">
+    <p style="font-size:0.85rem; color:var(--gray-dark); text-align:center;">
+      ¿Aún no participas? <a href="register.html" style="color:var(--green); font-weight:600;">Regístrate aquí</a>
+    </p>
+  </div>
+</div>
+
+<footer>
+  ReciRetiro Smart &nbsp;&middot;&nbsp; Municipalidad de Providencia &nbsp;&middot;&nbsp; Programa de reciclaje domiciliario
+</footer>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+
+  const NIVELES_CONFIG = {
+    Bronce:    { color: '#a0632a', bg: '#f5ebe0', emoji: '♻️', min: 0,  next: 5,  rango: '1–4 retiros / 6 meses' },
+    Plata:     { color: '#707070', bg: '#f0f0f0', emoji: '🌿', min: 5,  next: 12, rango: '5–11 retiros / 6 meses' },
+    Oro:       { color: '#b8860b', bg: '#fef9e7', emoji: '⭐', min: 12, next: 24, rango: '12–23 retiros / 6 meses' },
+    Esmeralda: { color: '#1e5f3f', bg: '#e8f2ec', emoji: '💎', min: 24, next: null, rango: '24+ retiros / 6 meses' }
+  };
+
+  const BENEFICIOS = {
+    Bronce:    ['Historial digital en panel personal', 'Estimación de CO₂ evitado', 'Recordatorio por WhatsApp', 'Acceso al mapa de puntos limpios'],
+    Plata:     ['Kit vermicompostera domiciliaria', 'Inscripción prioritaria en talleres DAOM', 'Certificado digital de reciclador'],
+    Oro:       ['Descuento combustible Petrobras ($15/litro)', 'Entradas gratuitas a eventos culturales', 'Acceso prioritario Provisalud', 'Mención en ranking comunal'],
+    Esmeralda: ['Exención parcial del derecho de aseo', 'Acceso preferencial Plaza Persa', 'Reconocimiento público anual', 'Participación en Consejo Ambiental Vecinal']
+  };
+
+  const NIVELES_ORD = ['Bronce', 'Plata', 'Oro', 'Esmeralda'];
+
+  function calcularNivel(retiros) {
+    if (retiros >= 24) return 'Esmeralda';
+    if (retiros >= 12) return 'Oro';
+    if (retiros >= 5)  return 'Plata';
+    return 'Bronce';
+  }
+
+  async function load() {
+    if (!code) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('not-found').style.display = 'block';
+      return;
+    }
+
+    const { data: neighbor, error } = await db.from('neighbors').select('*').eq('code', code).single();
+    if (error || !neighbor) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('not-found').style.display = 'block';
+      document.getElementById('search-error').innerHTML = '<div class="alert alert-error">Código no encontrado. Verifica e intenta nuevamente.</div>';
+      return;
+    }
+
+    const seisM = new Date();
+    seisM.setMonth(seisM.getMonth() - 6);
+
+    const [{ data: pickups6m }, { data: allPickups }] = await Promise.all([
+      db.from('pickups').select('id').eq('neighbor_code', code).gte('created_at', seisM.toISOString()),
+      db.from('pickups').select('*').eq('neighbor_code', code)
+    ]);
+
+    const retiros6m   = pickups6m  ? pickups6m.length  : 0;
+    const totalRetiros = allPickups ? allPickups.length : 0;
+    const totalBolsas  = allPickups ? allPickups.reduce((s, p) => s + (p.bags || 1), 0) : 0;
+    const nivelNombre  = calcularNivel(retiros6m);
+    const nivelCfg     = NIVELES_CONFIG[nivelNombre];
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+    document.getElementById('panel-link').href = 'panel.html?code=' + neighbor.code;
+
+    // HERO
+    const initials = ((neighbor.name || '')[0] + (neighbor.last_name || '')[0]).toUpperCase();
+    const avatar = document.getElementById('perfil-avatar');
+    avatar.textContent = initials;
+    avatar.style.background = nivelCfg.color + '99';
+
+    const badge = document.getElementById('nivel-badge-hero');
+    badge.textContent = nivelCfg.emoji + '  Nivel ' + nivelNombre;
+    badge.style.background = nivelCfg.color + '30';
+    badge.style.color = 'white';
+    badge.style.border = '1px solid ' + nivelCfg.color + '55';
+
+    document.getElementById('perfil-name').textContent = neighbor.name + ' ' + neighbor.last_name;
+    document.getElementById('perfil-code').textContent = neighbor.code;
+    document.getElementById('perfil-sector').textContent = neighbor.sector + '  ·  Providencia';
+
+    // STATS
+    document.getElementById('stats-grid').innerHTML = `
+      <div class="stat-card">
+        <div class="stat-card-number">${totalRetiros}</div>
+        <div class="stat-card-label">Retiros totales</div>
+      </div>
+      <div class="stat-card" style="border-top-color:#3a9e6b;">
+        <div class="stat-card-number">${(totalBolsas * 3.5).toFixed(0)}</div>
+        <div class="stat-card-label">Kg reciclados</div>
+      </div>
+      <div class="stat-card" style="border-top-color:#1a4a7a;">
+        <div class="stat-card-number">${(totalBolsas * 1.2).toFixed(0)}</div>
+        <div class="stat-card-label">Kg CO₂ evitados</div>
+      </div>
+      <div class="stat-card" style="border-top-color:${nivelCfg.color};">
+        <div class="stat-card-number" style="color:${nivelCfg.color};">${retiros6m}</div>
+        <div class="stat-card-label">Retiros últimos 6 meses</div>
+      </div>
+    `;
+
+    // PROGRESS
+    const nextNombre = nivelCfg.next ? calcularNivel(nivelCfg.next) : null;
+    document.getElementById('progress-card').style.display = 'block';
+    if (nextNombre) {
+      const nextCfg = NIVELES_CONFIG[nextNombre];
+      const meta     = nivelCfg.next;
+      const pct      = Math.min(100, Math.round((retiros6m / meta) * 100));
+      const faltan   = meta - retiros6m;
+      document.getElementById('progress-content').innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:1rem; font-weight:700; color:${nivelCfg.color};">${nivelCfg.emoji} ${nivelNombre}</span>
+            <span style="color:var(--gray-mid); font-size:1.1rem;">→</span>
+            <span style="font-size:1rem; font-weight:700; color:${nextCfg.color};">${nextCfg.emoji} ${nextNombre}</span>
+          </div>
+          <span style="font-size:0.88rem; font-weight:700; color:var(--green);">${retiros6m} / ${meta} retiros</span>
+        </div>
+        <div style="height:14px; background:var(--gray-light); border-radius:100px; overflow:hidden; margin-bottom:12px;">
+          <div style="height:100%; width:${pct}%; background:linear-gradient(90deg,${nivelCfg.color},${nextCfg.color}); border-radius:100px; transition:width 1s ease;"></div>
+        </div>
+        <p style="font-size:0.84rem; color:var(--gray-dark); line-height:1.6;">
+          Faltan <strong style="color:var(--text);">${faltan} retiro${faltan !== 1 ? 's' : ''}</strong> para alcanzar el nivel
+          <strong style="color:${nextCfg.color};">${nextNombre}</strong> y desbloquear nuevos beneficios de Providencia.
+        </p>
+      `;
+    } else {
+      document.getElementById('progress-content').innerHTML = `
+        <div style="display:flex; align-items:center; gap:14px; padding:16px 20px; background:var(--green-light); border-radius:10px;">
+          <span style="font-size:1.8rem;">💎</span>
+          <div>
+            <div style="font-weight:700; color:var(--green); margin-bottom:3px;">Nivel máximo alcanzado</div>
+            <div style="font-size:0.85rem; color:var(--gray-dark);">Has alcanzado Esmeralda, el nivel más alto del programa. ¡Felicitaciones!</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // BENEFITS
+    const idxActual = NIVELES_ORD.indexOf(nivelNombre);
+    let benefitsHtml = '';
+    NIVELES_ORD.forEach((niv, idx) => {
+      const cfg          = NIVELES_CONFIG[niv];
+      const desbloqueado = idx <= idxActual;
+      const esActual     = idx === idxActual;
+
+      benefitsHtml += `
+        <div class="benefit-level-card" style="
+          background:${desbloqueado ? cfg.bg : '#f8f9f8'};
+          border-color:${desbloqueado ? cfg.color + '50' : 'var(--gray-light)'};
+          ${!desbloqueado ? 'opacity:0.62;' : ''}
+        ">
+          <div class="benefit-level-header">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:1.2rem;">${cfg.emoji}</span>
+              <div>
+                <div class="benefit-level-name" style="color:${desbloqueado ? cfg.color : 'var(--gray-dark)'}; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                  ${niv}
+                  ${esActual ? `<span style="font-size:0.65rem; background:${cfg.color}; color:white; padding:2px 9px; border-radius:4px; font-weight:700; letter-spacing:0.04em;">NIVEL ACTUAL</span>` : ''}
+                  ${!desbloqueado ? `<span style="font-size:0.65rem; background:var(--gray-light); color:var(--gray-dark); padding:2px 9px; border-radius:4px; font-weight:600;">BLOQUEADO</span>` : ''}
+                </div>
+                <div class="benefit-level-range" style="color:${desbloqueado ? cfg.color : 'var(--gray-dark)'};">${cfg.rango}</div>
+              </div>
+            </div>
+            <span style="font-size:1.3rem;">${desbloqueado ? '✅' : '🔒'}</span>
+          </div>
+          <div>
+            ${BENEFICIOS[niv].map(b => `
+              <div class="benefit-item" style="background:${desbloqueado ? 'rgba(255,255,255,0.65)' : 'transparent'}; color:${desbloqueado ? 'var(--text)' : 'var(--gray-dark)'};">
+                <div class="benefit-dot" style="background:${desbloqueado ? cfg.color : 'var(--gray-mid)'};"></div>
+                <span>${b}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    });
+    document.getElementById('benefits-content').innerHTML = benefitsHtml;
+
+    // QR CODES
+    const qr1Url = window.location.origin + '/scan.html#pickup/' + neighbor.code;
+    const qr2Url = window.location.origin + '/perfil.html?code='  + neighbor.code;
+
+    new QRCode(document.getElementById('qr1-container'), {
+      text: qr1Url, width: 160, height: 160,
+      colorDark: '#1a4731', colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+    new QRCode(document.getElementById('qr2-container'), {
+      text: qr2Url, width: 160, height: 160,
+      colorDark: '#1a4a7a', colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  }
+
+  function downloadQR(containerId, label) {
+    const canvas = document.querySelector('#' + containerId + ' canvas');
+    if (!canvas) { alert('El QR aún se está generando, intenta en un momento.'); return; }
+    const link = document.createElement('a');
+    link.download = label + '-' + (code || 'perfil') + '.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  }
+
+  function searchPerfil() {
+    const raw   = document.getElementById('search-code').value.trim().toUpperCase();
+    if (!raw) return;
+    const match = raw.match(/REC-PROV-\d+/);
+    window.location.href = 'perfil.html?code=' + (match ? match[0] : raw);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    const input = document.getElementById('search-code');
+    if (e.key === 'Enter' && input && document.activeElement === input) searchPerfil();
+  });
+
+  load();
+</script>
+
+</body>
+</html>

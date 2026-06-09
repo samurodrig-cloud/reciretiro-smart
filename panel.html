@@ -82,12 +82,34 @@
       </div>
 
       <div>
-        <div class="card" style="text-align: center;">
-          <p style="font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-dark); margin-bottom: 4px;">Tu código QR</p>
-          <p style="font-size: 0.85rem; color: var(--gray-dark); margin-bottom: 20px;">Presenta este código al recolector o pégalo en tu contenedor</p>
-          <div id="qr-code" style="display: inline-block;"></div>
-          <div id="resident-code" style="font-size: 1rem; font-weight: 700; margin-top: 14px; color: var(--text); letter-spacing: 1px; font-family: 'Courier New', monospace;"></div>
-          <button onclick="downloadQR()" class="btn btn-outline btn-full" style="margin-top: 16px;">Descargar código QR</button>
+        <div class="card">
+          <div id="resident-code" style="font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--text); letter-spacing: 1px; font-family: 'Courier New', monospace; text-align:center;"></div>
+
+          <div style="margin-bottom:14px; padding:12px 14px; background:var(--gray-bg); border-radius:9px; font-size:0.8rem; color:var(--gray-dark); line-height:1.55;">
+            Tu basurero tiene estos dos QR impresos. Puedes descargarlos desde aquí si los necesitas.
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <div style="display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:2px 9px; border-radius:4px; background:var(--green-light); color:var(--green); margin-bottom:8px;">QR 1 — Recolector</div>
+            <p style="font-size:0.78rem; color:var(--gray-dark); margin-bottom:10px;">El camión municipal escanea este QR en cada retiro.</p>
+            <div style="text-align:center;">
+              <div id="qr-code" style="display:inline-block;"></div>
+            </div>
+            <button onclick="downloadQR('qr-code','QR1-Recolector')" class="btn btn-outline btn-full" style="margin-top:10px; font-size:0.82rem;">Descargar QR Recolector</button>
+          </div>
+
+          <hr class="divider">
+
+          <div>
+            <div style="display:inline-block; font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:2px 9px; border-radius:4px; background:var(--blue-light); color:var(--blue); margin-bottom:8px;">QR 2 — Perfil Público</div>
+            <p style="font-size:0.78rem; color:var(--gray-dark); margin-bottom:10px;">Cualquiera puede escanearlo para ver tu nivel y reciclaje acumulado.</p>
+            <div style="text-align:center;">
+              <div id="qr-perfil" style="display:inline-block;"></div>
+            </div>
+            <button onclick="downloadQR('qr-perfil','QR2-Perfil')" class="btn btn-outline btn-full" style="margin-top:10px; font-size:0.82rem; border-color:var(--blue); color:var(--blue);">Descargar QR Perfil</button>
+          </div>
+
+          <a id="perfil-link" href="#" class="btn btn-primary btn-full" style="margin-top:14px;">Ver mi perfil público</a>
         </div>
       </div>
 
@@ -196,6 +218,7 @@
 
     document.getElementById('next-date').textContent = getNextPickupDate(neighbor.preferred_day);
     document.getElementById('resident-code').textContent = neighbor.code;
+    document.getElementById('perfil-link').href = 'perfil.html?code=' + neighbor.code;
 
     const totalPickups = pickups ? pickups.length : 0;
     const totalBags = pickups ? pickups.reduce((s, p) => s + (p.bags || 1), 0) : 0;
@@ -228,13 +251,17 @@
 
     await renderBeneficios(code);
 
-    const qrUrl = window.location.origin + '/scan.html#pickup/' + neighbor.code;
+    const qr1Url = window.location.origin + '/scan.html#pickup/'  + neighbor.code;
+    const qr2Url = window.location.origin + '/perfil.html?code=' + neighbor.code;
+
     new QRCode(document.getElementById('qr-code'), {
-      text: qrUrl,
-      width: 200,
-      height: 200,
-      colorDark: '#1a4731',
-      colorLight: '#ffffff',
+      text: qr1Url, width: 180, height: 180,
+      colorDark: '#1a4731', colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+    new QRCode(document.getElementById('qr-perfil'), {
+      text: qr2Url, width: 180, height: 180,
+      colorDark: '#1a4a7a', colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.H
     });
   }
@@ -355,11 +382,11 @@
     document.getElementById('beneficios-content').innerHTML = html;
   }
 
-  function downloadQR() {
-    const canvas = document.querySelector('#qr-code canvas');
-    if (!canvas) return;
+  function downloadQR(containerId, label) {
+    const canvas = document.querySelector('#' + containerId + ' canvas');
+    if (!canvas) { alert('El QR aún se está generando, intenta en un momento.'); return; }
     const link = document.createElement('a');
-    link.download = 'QR-' + code + '.png';
+    link.download = label + '-' + code + '.png';
     link.href = canvas.toDataURL();
     link.click();
   }
