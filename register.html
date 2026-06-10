@@ -15,9 +15,9 @@
   </a>
   <div class="nav-links">
     <a href="register.html">Registrarse</a>
-    <a href="scan.html">Escanear QR</a>
     <a href="beneficios.html">Beneficios</a>
     <a href="mapa.html">Puntos limpios</a>
+    <a href="panel.html" id="nav-perfil-btn" style="display:none;">👤 Mi perfil</a>
     <a href="dashboard.html">Panel Municipal</a>
   </div>
 </nav>
@@ -43,7 +43,7 @@
       <div style="background: rgba(255,255,255,0.08); border-radius: 10px; padding: 16px 14px;">
         <div style="font-size: 1.4rem; margin-bottom: 8px;">🗑️</div>
         <div style="font-size: 0.82rem; font-weight: 700; color: white; margin-bottom: 5px;">2. Recibes tu basurero</div>
-        <div style="font-size: 0.78rem; color: rgba(255,255,255,0.58); line-height: 1.55;">La municipalidad te entrega un basurero con <strong style="color:white;">dos códigos QR</strong> impresos y pegados.</div>
+        <div style="font-size: 0.78rem; color: rgba(255,255,255,0.58); line-height: 1.55;">La municipalidad te entrega un basurero con un <strong style="color:white;">código QR único</strong> impreso y pegado.</div>
       </div>
       <div style="background: rgba(255,255,255,0.08); border-radius: 10px; padding: 16px 14px;">
         <div style="font-size: 1.4rem; margin-bottom: 8px;">♻️</div>
@@ -55,11 +55,6 @@
         <div style="font-size: 0.82rem; font-weight: 700; color: white; margin-bottom: 5px;">4. Acumulas puntos y beneficios</div>
         <div style="font-size: 0.78rem; color: rgba(255,255,255,0.58); line-height: 1.55;">Cada retiro suma puntos. Sube de nivel y desbloquea beneficios reales de Providencia.</div>
       </div>
-    </div>
-    <div style="background: rgba(255,255,255,0.09); border-radius: 9px; padding: 13px 16px; font-size: 0.8rem; color: rgba(255,255,255,0.68); line-height: 1.6;">
-      <strong style="color: white;">¿Para qué son los 2 QR del basurero?</strong><br>
-      El <strong style="color:white;">QR 1</strong> lo usa el recolector para registrar el retiro en cada visita.
-      El <strong style="color:white;">QR 2</strong> lo puedes escanear tú —o cualquier persona— para ver tu nivel, puntos acumulados y beneficios activos.
     </div>
   </div>
 
@@ -232,9 +227,16 @@
       return;
     }
 
+    localStorage.setItem('reciretiro_code', code);
     window.location.href = 'confirmation.html?code=' + code;
   });
 </script>
 
+<script>
+  (function(){
+    var c = localStorage.getItem('reciretiro_code');
+    if (c) { var el = document.getElementById('nav-perfil-btn'); if (el) el.style.display = 'inline-flex'; }
+  })();
+</script>
 </body>
 </html>

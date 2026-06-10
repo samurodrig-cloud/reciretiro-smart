@@ -23,9 +23,9 @@
   </a>
   <div class="nav-links">
     <a href="register.html">Registrarse</a>
-    <a href="scan.html">Escanear QR</a>
     <a href="beneficios.html">Beneficios</a>
     <a href="mapa.html">Puntos limpios</a>
+    <a href="panel.html" id="nav-perfil-btn" style="display:none;">👤 Mi perfil</a>
     <a href="dashboard.html">Panel Municipal</a>
   </div>
 </nav>
@@ -73,5 +73,11 @@
   }, 6000);
 </script>
 
+<script>
+  (function(){
+    var c = localStorage.getItem('reciretiro_code');
+    if (c) { var el = document.getElementById('nav-perfil-btn'); if (el) { el.style.display = 'inline-flex'; el.href = 'panel.html?code=' + c; } }
+  })();
+</script>
 </body>
 </html>

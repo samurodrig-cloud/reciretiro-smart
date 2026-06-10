@@ -3,95 +3,287 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Escanear QR — ReciRetiro Smart</title>
+  <title>Recolector — ReciRetiro Smart</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    body { background: #0f1a14; color: white; min-height: 100vh; }
+
+    .rec-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .rec-header-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .rec-main {
+      max-width: 440px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+
+    .scan-btn {
+      width: 100%;
+      background: var(--accent);
+      border: none;
+      border-radius: 14px;
+      padding: 28px 20px;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      font-family: inherit;
+      transition: background 0.15s, transform 0.1s;
+      margin-bottom: 20px;
+    }
+    .scan-btn:hover { background: #2d8a5a; transform: translateY(-1px); }
+    .scan-btn:active { transform: scale(0.98); }
+    .scan-btn-icon { font-size: 2.4rem; line-height: 1; }
+    .scan-btn-label { font-size: 1.05rem; font-weight: 700; }
+    .scan-btn-sub { font-size: 0.78rem; opacity: 0.75; }
+
+    .rec-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      color: rgba(255,255,255,0.25);
+      font-size: 0.78rem;
+    }
+    .rec-divider::before,
+    .rec-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .manual-box {
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .manual-box label {
+      display: block;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .manual-input {
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 11px 14px;
+      color: white;
+      font-size: 1rem;
+      font-family: 'Courier New', monospace;
+      text-transform: uppercase;
+      outline: none;
+      transition: border 0.15s;
+      box-sizing: border-box;
+    }
+    .manual-input::placeholder { color: rgba(255,255,255,0.25); }
+    .manual-input:focus { border-color: var(--accent); }
+
+    .btn-confirm-manual {
+      width: 100%;
+      margin-top: 10px;
+      background: rgba(255,255,255,0.1);
+      border: 1.5px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 11px;
+      color: white;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+    .btn-confirm-manual:hover { background: rgba(255,255,255,0.18); }
+
+    /* Scanner area */
+    #qr-reader { border-radius: 10px; overflow: hidden; border: 2px solid rgba(255,255,255,0.15); margin-bottom: 12px; }
+    #qr-reader img { display: none !important; }
+
+    /* Pickup confirmation screen */
+    .pickup-card {
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 16px;
+    }
+    .pickup-card h3 {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 16px;
+    }
+    .pickup-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      font-size: 0.88rem;
+      gap: 12px;
+    }
+    .pickup-row:last-child { border-bottom: none; }
+    .pickup-label { color: rgba(255,255,255,0.45); flex-shrink: 0; }
+    .pickup-value { font-weight: 600; text-align: right; }
+
+    .btn-registrar {
+      width: 100%;
+      background: var(--accent);
+      border: none;
+      border-radius: 12px;
+      padding: 18px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s;
+      letter-spacing: 0.01em;
+    }
+    .btn-registrar:hover { background: #2d8a5a; }
+    .btn-registrar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-volver {
+      width: 100%;
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 13px;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 10px;
+      transition: border-color 0.15s;
+    }
+    .btn-volver:hover { border-color: rgba(255,255,255,0.35); color: white; }
+
+    .alert-dark-success {
+      background: rgba(58,158,107,0.2);
+      border: 1.5px solid rgba(58,158,107,0.4);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 0.9rem;
+      color: #7ddba8;
+      margin-bottom: 12px;
+    }
+    .alert-dark-error {
+      background: rgba(192,57,43,0.2);
+      border: 1.5px solid rgba(192,57,43,0.4);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 0.9rem;
+      color: #f0908a;
+      margin-bottom: 12px;
+    }
+    .alert-dark-warning {
+      background: rgba(201,122,26,0.2);
+      border: 1.5px solid rgba(201,122,26,0.35);
+      border-radius: 10px;
+      padding: 13px 16px;
+      font-size: 0.85rem;
+      color: #f0c080;
+      margin-bottom: 12px;
+    }
+  </style>
 </head>
 <body>
 
-<nav>
-  <a href="index.html" class="nav-logo">
-    <div class="nav-logo-mark">RR</div>
-    ReciRetiro Smart
-  </a>
-  <div class="nav-links">
-    <a href="register.html">Registrarse</a>
-    <a href="scan.html">Escanear QR</a>
-    <a href="beneficios.html">Beneficios</a>
-    <a href="mapa.html">Puntos limpios</a>
-    <a href="dashboard.html">Panel Municipal</a>
-  </div>
-</nav>
-
-<!-- PICKUP RECORD VIEW -->
-<div id="pickup-view" style="display:none;">
-  <div class="container-sm">
-    <div id="pickup-loading" class="loading" style="margin-top: 48px;">
-      <div class="spinner"></div>
-      <p>Buscando vecino...</p>
-    </div>
-
-    <div id="pickup-content" style="display:none; margin-top: 16px;">
-      <div class="alert alert-info">
-        Registro de retiro — Confirma el retiro presionando el botón al final de la página.
-      </div>
-
-      <div class="card">
-        <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 16px;">Ficha del vecino</h2>
-        <div id="pickup-neighbor-info"></div>
-      </div>
-
-      <div class="card">
-        <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 16px;">Historial de retiros</h3>
-        <div id="pickup-history"></div>
-      </div>
-
-      <div class="card" id="confirm-card">
-        <p style="font-size: 0.93rem; color: var(--gray-dark); margin-bottom: 20px; text-align: center;">Confirma el retiro de reciclaje de este vecino.</p>
-        <button id="confirm-btn" onclick="confirmPickup()" class="btn btn-primary btn-full btn-lg">
-          Marcar como retirado
-        </button>
-        <div id="confirm-result" style="margin-top: 16px;"></div>
-      </div>
-    </div>
-
-    <div id="pickup-not-found" style="display:none;">
-      <div class="card" style="margin-top: 48px; text-align: center;">
-        <h2 style="margin-bottom: 8px;">Código no registrado</h2>
-        <p style="color: var(--gray-dark);">Este código QR no se encuentra en el sistema.</p>
-      </div>
-    </div>
-  </div>
+<!-- MINIMAL HEADER -->
+<div class="rec-header">
+  <div class="nav-logo-mark" style="width:28px; height:28px; background:var(--accent); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; color:white; flex-shrink:0;">RR</div>
+  <span class="rec-header-label">Modo Recolector</span>
 </div>
 
 <!-- SCANNER VIEW -->
 <div id="scanner-view">
-  <div class="container-sm">
-    <div class="page-title" style="margin-top: 8px;">
-      <h1>Escanear código QR</h1>
-      <p>Apunta la cámara al código QR del contenedor del vecino.</p>
-    </div>
+  <div class="rec-main">
 
-    <div class="card">
+    <button class="scan-btn" id="scan-camera-btn" onclick="startCamera()">
+      <span class="scan-btn-icon">📷</span>
+      <span class="scan-btn-label">Escanear código QR</span>
+      <span class="scan-btn-sub">Toca para activar la cámara</span>
+    </button>
+
+    <div id="camera-area" style="display:none; margin-bottom:20px;">
       <div id="qr-reader"></div>
-      <div id="scan-result" style="margin-top: 16px;"></div>
+      <button onclick="stopCamera()" class="btn-volver" style="margin-top:8px;">Cancelar cámara</button>
     </div>
 
-    <div class="card">
-      <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 6px;">Ingreso manual</h3>
-      <p style="font-size: 0.85rem; color: var(--gray-dark); margin-bottom: 16px;">Si la cámara no está disponible, ingresa el código directamente.</p>
-      <div style="display: flex; gap: 8px;">
-        <input type="text" id="manual-code" placeholder="Ej: REC-PROV-1842"
-          style="flex: 1; padding: 10px 14px; border: 1.5px solid var(--gray-mid); border-radius: 8px; font-size: 0.93rem; font-family: inherit;">
-        <button onclick="searchManual()" class="btn btn-primary">Buscar</button>
-      </div>
-      <div id="manual-result" style="margin-top: 12px;"></div>
+    <div id="scan-result"></div>
+
+    <div class="rec-divider">o ingresa el código manualmente</div>
+
+    <div class="manual-box">
+      <label>Código del vecino</label>
+      <input type="text" id="manual-code" class="manual-input" placeholder="REC-PROV-XXXX" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button onclick="searchManual()" class="btn-confirm-manual">Confirmar</button>
     </div>
+
   </div>
 </div>
 
-<footer>
-  ReciRetiro Smart &nbsp;&middot;&nbsp; Municipalidad de Providencia
-</footer>
+<!-- PICKUP VIEW -->
+<div id="pickup-view" style="display:none;">
+  <div class="rec-main">
+
+    <div id="pickup-loading" style="text-align:center; padding:48px 0; color:rgba(255,255,255,0.4);">
+      <div class="spinner" style="border-color:rgba(255,255,255,0.15); border-top-color:var(--accent);"></div>
+      <p style="margin-top:12px; font-size:0.88rem;">Buscando vecino...</p>
+    </div>
+
+    <div id="pickup-content" style="display:none;">
+      <div class="pickup-card">
+        <h3>Vecino</h3>
+        <div id="pickup-neighbor-info"></div>
+      </div>
+
+      <div class="pickup-card" id="pickup-history-card">
+        <h3>Últimos retiros</h3>
+        <div id="pickup-history"></div>
+      </div>
+
+      <div id="confirm-area">
+        <div id="confirm-result"></div>
+        <button id="confirm-btn" onclick="confirmPickup()" class="btn-registrar">
+          ✓ Marcar como retirado
+        </button>
+        <button onclick="resetScanner()" class="btn-volver">← Escanear otro</button>
+      </div>
+    </div>
+
+    <div id="pickup-not-found" style="display:none; text-align:center; padding:32px 0;">
+      <div style="font-size:2rem; margin-bottom:12px;">🔍</div>
+      <p style="font-weight:700; margin-bottom:6px;">Código no registrado</p>
+      <p style="font-size:0.85rem; color:rgba(255,255,255,0.45);">Este código no se encuentra en el sistema.</p>
+      <button onclick="resetScanner()" class="btn-volver" style="margin-top:20px;">← Volver</button>
+    </div>
+
+  </div>
+</div>
 
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -100,11 +292,12 @@
   const { createClient } = supabase;
   const db = createClient(SUPABASE_URL, SUPABASE_KEY);
   let currentNeighbor = null;
+  let html5QrCode = null;
 
   function formatDate(dateStr) {
     if (!dateStr) return '—';
     const d = new Date(dateStr + 'T12:00:00');
-    return d.toLocaleDateString('es-CL', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+    return d.toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
   function extractCode(text) {
@@ -113,6 +306,45 @@
     const directMatch = text.match(/REC-PROV-\d+/);
     if (directMatch) return directMatch[0];
     return text.trim().toUpperCase();
+  }
+
+  function startCamera() {
+    document.getElementById('scan-camera-btn').style.display = 'none';
+    document.getElementById('camera-area').style.display = 'block';
+
+    html5QrCode = new Html5Qrcode('qr-reader');
+    html5QrCode.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 240, height: 240 } },
+      (decodedText) => {
+        stopCamera();
+        const code = extractCode(decodedText);
+        loadPickupView(code);
+      },
+      () => {}
+    ).catch(() => {
+      document.getElementById('scan-result').innerHTML = '<div class="alert-dark-warning">No se pudo acceder a la cámara. Usa el ingreso manual.</div>';
+      document.getElementById('camera-area').style.display = 'none';
+      document.getElementById('scan-camera-btn').style.display = 'flex';
+    });
+  }
+
+  function stopCamera() {
+    if (html5QrCode) {
+      html5QrCode.stop().catch(() => {});
+      html5QrCode = null;
+    }
+    document.getElementById('camera-area').style.display = 'none';
+    document.getElementById('scan-camera-btn').style.display = 'flex';
+  }
+
+  function resetScanner() {
+    currentNeighbor = null;
+    document.getElementById('pickup-view').style.display = 'none';
+    document.getElementById('scanner-view').style.display = 'block';
+    document.getElementById('manual-code').value = '';
+    document.getElementById('scan-result').innerHTML = '';
+    window.location.hash = '';
   }
 
   async function loadPickupView(code) {
@@ -134,30 +366,30 @@
     document.getElementById('pickup-content').style.display = 'block';
 
     document.getElementById('pickup-neighbor-info').innerHTML = `
-      <div class="info-row"><span class="info-label">Código</span><span class="info-value" style="font-family:monospace;">${neighbor.code}</span></div>
-      <div class="info-row"><span class="info-label">Nombre</span><span class="info-value">${neighbor.name} ${neighbor.last_name}</span></div>
-      <div class="info-row"><span class="info-label">Dirección</span><span class="info-value">${neighbor.address}${neighbor.apartment ? ', ' + neighbor.apartment : ''}</span></div>
-      <div class="info-row"><span class="info-label">Sector</span><span class="info-value">${neighbor.sector}</span></div>
-      <div class="info-row"><span class="info-label">Teléfono</span><span class="info-value">${neighbor.phone || '—'}</span></div>
-      <div class="info-row"><span class="info-label">Frecuencia</span><span class="info-value">${neighbor.frequency}</span></div>
-      <div class="info-row"><span class="info-label">Estado</span><span class="info-value"><span class="badge badge-green">Activo</span></span></div>
+      <div class="pickup-row"><span class="pickup-label">Código</span><span class="pickup-value" style="font-family:monospace; font-size:0.82rem;">${neighbor.code}</span></div>
+      <div class="pickup-row"><span class="pickup-label">Nombre</span><span class="pickup-value">${neighbor.name} ${neighbor.last_name}</span></div>
+      <div class="pickup-row"><span class="pickup-label">Dirección</span><span class="pickup-value">${neighbor.address}${neighbor.apartment ? ', ' + neighbor.apartment : ''}</span></div>
+      <div class="pickup-row"><span class="pickup-label">Sector</span><span class="pickup-value">${neighbor.sector}</span></div>
     `;
 
-    const { data: pickups } = await db.from('pickups').select('*').eq('neighbor_code', code).order('pickup_date', { ascending: false }).limit(5);
+    const { data: pickups } = await db.from('pickups').select('*')
+      .eq('neighbor_code', code).order('pickup_date', { ascending: false }).limit(3);
 
     if (!pickups || pickups.length === 0) {
-      document.getElementById('pickup-history').innerHTML = '<p style="color: var(--gray-dark); font-size: 0.88rem;">Sin retiros previos registrados.</p>';
+      document.getElementById('pickup-history').innerHTML = '<p style="font-size:0.82rem; color:rgba(255,255,255,0.35);">Sin retiros previos.</p>';
     } else {
-      const last = pickups[0];
-      let rows = pickups.map(p => `<tr><td>${formatDate(p.pickup_date)}</td><td>${p.bags || 1} bolsa(s)</td><td><span class="badge badge-green">Retirado</span></td></tr>`).join('');
-      document.getElementById('pickup-history').innerHTML = `
-        <div class="info-row"><span class="info-label">Último retiro</span><span class="info-value">${formatDate(last.pickup_date)}</span></div>
-        <div class="info-row"><span class="info-label">Total retiros</span><span class="info-value">${pickups.length}</span></div>
-        <div class="table-wrapper" style="margin-top:14px;">
-          <table><thead><tr><th>Fecha</th><th>Bolsas</th><th>Estado</th></tr></thead>
-          <tbody>${rows}</tbody></table>
-        </div>`;
+      document.getElementById('pickup-history').innerHTML = pickups.map(p => `
+        <div class="pickup-row">
+          <span class="pickup-label">${formatDate(p.pickup_date)}</span>
+          <span class="pickup-value" style="color:rgba(58,158,107,0.9); font-size:0.82rem;">✓ Retirado</span>
+        </div>`).join('');
     }
+
+    // Reset confirm button
+    const btn = document.getElementById('confirm-btn');
+    btn.disabled = false;
+    btn.textContent = '✓ Marcar como retirado';
+    document.getElementById('confirm-result').innerHTML = '';
   }
 
   async function confirmPickup() {
@@ -175,28 +407,22 @@
     }]);
 
     if (error) {
-      document.getElementById('confirm-result').innerHTML = '<div class="alert alert-error">Error al registrar. Intenta nuevamente.</div>';
+      document.getElementById('confirm-result').innerHTML = '<div class="alert-dark-error">Error al registrar. Intenta nuevamente.</div>';
       btn.disabled = false;
-      btn.textContent = 'Marcar como retirado';
+      btn.textContent = '✓ Marcar como retirado';
       return;
     }
 
-    document.getElementById('confirm-card').innerHTML = `
-      <div class="alert alert-success">
-        Retiro registrado exitosamente.
-      </div>
-      <div class="info-row"><span class="info-label">Vecino</span><span class="info-value">${currentNeighbor.name} ${currentNeighbor.last_name}</span></div>
-      <div class="info-row"><span class="info-label">Código</span><span class="info-value" style="font-family:monospace;">${currentNeighbor.code}</span></div>
-      <div class="info-row"><span class="info-label">Fecha</span><span class="info-value">${new Date().toLocaleDateString('es-CL')}</span></div>
-      <a href="scan.html" class="btn btn-outline btn-full" style="margin-top: 16px;">Escanear otro código</a>
+    document.getElementById('confirm-result').innerHTML = `
+      <div class="alert-dark-success">✓ Retiro registrado — ${currentNeighbor.name} ${currentNeighbor.last_name}</div>
     `;
+    btn.style.display = 'none';
   }
 
   function searchManual() {
     const raw = document.getElementById('manual-code').value.trim();
     if (!raw) return;
     const code = extractCode(raw);
-    window.location.hash = '#pickup/' + code;
     loadPickupView(code);
   }
 
@@ -204,30 +430,11 @@
     if (e.key === 'Enter') searchManual();
   });
 
-  function checkHash() {
-    const hash = window.location.hash;
-    if (hash && hash.startsWith('#pickup/')) {
-      const code = hash.replace('#pickup/', '').trim();
-      if (code) { loadPickupView(code); return true; }
-    }
-    return false;
-  }
-
-  if (!checkHash()) {
-    const html5QrCode = new Html5Qrcode('qr-reader');
-    html5QrCode.start(
-      { facingMode: 'environment' },
-      { fps: 10, qrbox: { width: 250, height: 250 } },
-      (decodedText) => {
-        html5QrCode.stop();
-        const code = extractCode(decodedText);
-        window.location.hash = '#pickup/' + code;
-        loadPickupView(code);
-      },
-      () => {}
-    ).catch(() => {
-      document.getElementById('scan-result').innerHTML = '<div class="alert alert-warning">No se pudo acceder a la cámara. Usa el ingreso manual.</div>';
-    });
+  // Check URL hash on load
+  const hash = window.location.hash;
+  if (hash && hash.startsWith('#pickup/')) {
+    const code = hash.replace('#pickup/', '').trim();
+    if (code) loadPickupView(code);
   }
 </script>
 

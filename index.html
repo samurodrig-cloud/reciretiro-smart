@@ -15,9 +15,9 @@
   </a>
   <div class="nav-links">
     <a href="register.html">Registrarse</a>
-    <a href="scan.html">Escanear QR</a>
     <a href="beneficios.html">Beneficios</a>
     <a href="mapa.html">Puntos limpios</a>
+    <a href="panel.html" id="nav-perfil-btn" style="display:none;">👤 Mi perfil</a>
     <a href="dashboard.html">Panel Municipal</a>
   </div>
 </nav>
@@ -26,7 +26,7 @@
   <div class="hero-inner">
     <div class="hero-label">Municipalidad de Providencia</div>
     <h1>El reciclaje,<br>sin complicaciones</h1>
-    <p>Regístrate una vez y la municipalidad te entrega tu basurero con dos códigos QR. Cada retiro queda registrado automáticamente y acumulas beneficios reales de Providencia.</p>
+    <p>Regístrate una vez y la municipalidad te entrega tu basurero con un código QR único. Cada retiro queda registrado automáticamente y acumulas beneficios reales de Providencia.</p>
     <div class="hero-buttons">
       <a href="register.html" class="btn btn-primary btn-lg">Registrarme como vecino</a>
       <a href="panel.html" class="btn btn-secondary btn-lg">Ya soy vecino</a>
@@ -61,7 +61,7 @@
   <div class="step">
     <div class="step-number">02</div>
     <h3>Recibes tu basurero</h3>
-    <p>La municipalidad te entrega un basurero con <strong>dos QR impresos</strong>: uno para el recolector y otro para ver tu perfil y progreso.</p>
+    <p>La municipalidad te entrega un basurero con un QR único impreso. El recolector lo escanea al pasar, y tú accedes a tu perfil desde tu panel personal.</p>
   </div>
   <div class="step">
     <div class="step-number">03</div>
@@ -125,5 +125,11 @@
   ReciRetiro Smart &nbsp;&middot;&nbsp; Municipalidad de Providencia &nbsp;&middot;&nbsp; Sistema de trazabilidad de reciclaje domiciliario
 </footer>
 
+<script>
+  (function(){
+    var c = localStorage.getItem('reciretiro_code');
+    if (c) { var el = document.getElementById('nav-perfil-btn'); if (el) el.style.display = 'inline-flex'; }
+  })();
+</script>
 </body>
 </html>

@@ -51,9 +51,9 @@
     </a>
     <div class="nav-links">
       <a href="register.html">Registrarse</a>
-      <a href="scan.html">Escanear QR</a>
-    <a href="beneficios.html">Beneficios</a>
-    <a href="mapa.html">Puntos limpios</a>
+      <a href="beneficios.html">Beneficios</a>
+      <a href="mapa.html">Puntos limpios</a>
+      <a href="panel.html" id="nav-perfil-btn" style="display:none;">👤 Mi perfil</a>
       <span id="nav-user"></span>
       <a href="#" onclick="logout()">Salir</a>
     </div>
@@ -672,6 +672,10 @@
     document.getElementById('nav-user').textContent = 'Administrador';
     loadDashboard().then(startAutoRefresh);
   }
+  (function(){
+    var c = localStorage.getItem('reciretiro_code');
+    if (c) { var el = document.getElementById('nav-perfil-btn'); if (el) { el.style.display = 'inline-flex'; el.href = 'panel.html?code=' + c; } }
+  })();
 </script>
 
 </body>
