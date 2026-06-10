@@ -776,6 +776,7 @@
   (function(){
     var c = localStorage.getItem('reciretiro_code');
     if (c) { var el = document.getElementById('nav-perfil-btn'); if (el) { el.style.display = 'inline-flex'; el.href = 'panel.html?code=' + c; } }
+  var logo = document.querySelector('.nav-logo'); if (logo) logo.addEventListener('dblclick', function(){ window.location.href = 'recolector.html'; });
   })();
 </script>
 </body>
