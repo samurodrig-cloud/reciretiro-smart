@@ -171,7 +171,7 @@
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
   if (code) localStorage.setItem('reciretiro_code', code);
-  const DAYS = { Lunes: 1, Martes: 2, Miércoles: 3, Jueves: 4, Viernes: 5 };
+  const DAYS = { Lunes: 1, Martes: 2, Miércoles: 3, Jueves: 4, Viernes: 5, Sábado: 6, Domingo: 7 };
 
   function getNextPickupDate(preferredDay) {
     const today = new Date();
