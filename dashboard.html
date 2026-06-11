@@ -415,8 +415,9 @@
       <hr class="divider">
       <h3 style="font-size:0.9rem; font-weight:700; margin-bottom:12px;">Historial</h3>
       ${historyRows}
-      <div style="margin-top:20px; display:flex; gap:10px;">
-        <a href="scan.html#pickup/${n.code}" class="btn btn-primary" style="flex:1;">Registrar retiro</a>
+      <div id="modal-pickup-result"></div>
+      <div style="margin-top:14px; display:flex; gap:10px;">
+        <button id="modal-pickup-btn" onclick="markPickupFromModal('${n.code}')" class="btn btn-primary" style="flex:1;">+ Registrar retiro hoy</button>
         <button onclick="closeModal()" class="btn btn-outline" style="flex:1;">Cerrar</button>
       </div>
     `;
@@ -425,6 +426,36 @@
 
   function closeModal() {
     document.getElementById('modal-overlay').style.display = 'none';
+  }
+
+  async function markPickupFromModal(code) {
+    const btn = document.getElementById('modal-pickup-btn');
+    const result = document.getElementById('modal-pickup-result');
+    if (!btn) return;
+    btn.disabled = true;
+    btn.textContent = 'Registrando...';
+
+    const today = new Date().toISOString().split('T')[0];
+    const { error } = await db.from('pickups').insert([{
+      neighbor_code: code, pickup_date: today, status: 'picked_up', bags: 1
+    }]);
+
+    if (error) {
+      btn.disabled = false;
+      btn.textContent = '+ Registrar retiro hoy';
+      result.innerHTML = '<div class="alert alert-error" style="margin-top:8px;">Error al registrar. Intenta nuevamente.</div>';
+      return;
+    }
+
+    // Actualizar datos en memoria sin recargar toda la página
+    allPickups.unshift({ neighbor_code: code, pickup_date: today, status: 'picked_up', bags: 1, created_at: new Date().toISOString() });
+    renderKPIs();
+    renderNiveles();
+    renderInactive();
+    renderTable(allNeighbors);
+
+    // Refrescar el modal con el historial actualizado
+    viewRecord(code);
   }
 
   async function markPickup(code) {
