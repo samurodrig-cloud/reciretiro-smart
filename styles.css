@@ -869,14 +869,106 @@ footer {
   color: var(--green);
 }
 
+/* ── HAMBURGER (base — hidden on desktop) ── */
+.nav-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1.5px solid rgba(255,255,255,0.22);
+  border-radius: 7px;
+  color: white;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  line-height: 1;
+}
+.nav-hamburger:hover { background: rgba(255,255,255,0.1); }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 640px) {
-  .hero h1  { font-size: 1.8rem; }
-  .form-row { grid-template-columns: 1fr; }
-  .nav-links { display: none; }
+
+  /* NAV */
+  nav { padding: 0 16px; }
+  .nav-hamburger { display: flex; }
+  .nav-links {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background: rgba(22, 60, 42, 0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    flex-direction: column;
+    padding: 6px 0 20px;
+    gap: 0;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+    z-index: 99;
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links a, .nav-links span {
+    padding: 14px 24px;
+    border-radius: 0;
+    font-size: 0.95rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav-links a:last-child { border-bottom: none; }
+
+  /* HERO */
+  .hero { padding: 52px 20px 44px; }
+  .hero h1 { font-size: 1.75rem; }
+  .hero p { font-size: 0.92rem; }
+  .hero-buttons { flex-direction: column; align-items: stretch; gap: 10px; }
+  .hero-buttons .btn { width: 100%; justify-content: center; }
+  .hero-recolector-link { display: block; text-align: center; }
+  .stat-bar { gap: 20px; margin-top: 32px; }
+  .stat-number { font-size: 1.5rem; }
+  .stat-label { font-size: 0.68rem; }
+
+  /* LAYOUT */
   .container, .container-sm { padding: 20px 16px; }
-  .card { padding: 20px; }
-  th, td { padding: 10px 12px; }
-  .stat-bar { gap: 28px; }
-  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .card { padding: 20px 16px; }
+  .card-sm { padding: 16px; }
+  .page-title h1 { font-size: 1.2rem; }
+  .section-header { flex-wrap: wrap; gap: 10px; }
+  .section-header h2 { font-size: 0.98rem; }
+
+  /* FORMS — 16px previene zoom automático en iOS */
+  .form-row { grid-template-columns: 1fr; }
+  .form-group input,
+  .form-group select { font-size: 16px; min-height: 46px; }
+
+  /* BOTONES — target táctil mínimo 44px */
+  .btn { min-height: 44px; font-size: 0.88rem; }
+  .btn-lg { padding: 13px 24px; font-size: 0.92rem; }
+
+  /* TABLA */
+  th, td { padding: 10px 12px; font-size: 0.8rem; }
+  .table-wrapper { -webkit-overflow-scrolling: touch; }
+
+  /* KPIs */
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .kpi-number { font-size: 1.85rem; }
+  .kpi-card { padding: 18px 14px; }
+
+  /* IMPACTO */
+  .impact-grid { gap: 10px; }
+  .impact-number { font-size: 1.35rem; }
+  .impact-item { padding: 12px; }
+
+  /* SECTORES */
+  .sector-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sector-pct { font-size: 1.6rem; }
+
+  /* STEPS */
+  .steps { padding: 32px 16px; gap: 12px; }
+
+  /* FOOTER */
+  footer { padding: 20px 16px; font-size: 0.75rem; margin-top: 40px; }
 }
