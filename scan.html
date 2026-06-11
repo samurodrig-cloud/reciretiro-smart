@@ -215,6 +215,71 @@
       color: #f0908a;
       margin-bottom: 12px;
     }
+    /* Login */
+    .scan-login-wrap {
+      max-width: 340px;
+      margin: 56px auto 0;
+      padding: 0 20px;
+    }
+    .scan-login-card {
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 18px;
+      padding: 36px 28px;
+    }
+    .scan-login-logo {
+      width: 46px;
+      height: 46px;
+      background: var(--accent);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: white;
+      margin: 0 auto 16px;
+    }
+    .scan-login-label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .scan-login-input {
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      border: 1.5px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 11px 14px;
+      color: white;
+      font-size: 0.93rem;
+      font-family: inherit;
+      outline: none;
+      transition: border 0.15s;
+      box-sizing: border-box;
+      margin-bottom: 14px;
+    }
+    .scan-login-input::placeholder { color: rgba(255,255,255,0.22); }
+    .scan-login-input:focus { border-color: var(--accent); }
+    .scan-login-btn {
+      width: 100%;
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      color: white;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, transform 0.1s;
+      margin-top: 4px;
+    }
+    .scan-login-btn:hover { background: #2d8a5a; transform: translateY(-1px); }
     .alert-dark-warning {
       background: rgba(201,122,26,0.2);
       border: 1.5px solid rgba(201,122,26,0.35);
@@ -228,7 +293,33 @@
 </head>
 <body>
 
+<!-- LOGIN VIEW -->
+<div id="scan-login-view" style="display:none;">
+  <div class="rec-header">
+    <div class="nav-logo-mark" style="width:28px; height:28px; background:var(--accent); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; color:white; flex-shrink:0;">RR</div>
+    <span class="rec-header-label">Modo Recolector</span>
+    <a href="index.html" class="rec-home-link">← Inicio</a>
+  </div>
+  <div class="scan-login-wrap">
+    <div class="scan-login-card">
+      <div style="text-align:center; margin-bottom:28px;">
+        <div class="scan-login-logo">RR</div>
+        <h2 style="font-size:1.1rem; font-weight:700; color:white; margin-bottom:4px;">Acceso Recolector</h2>
+        <p style="font-size:0.78rem; color:rgba(255,255,255,0.4);">Municipalidad de Providencia</p>
+      </div>
+      <div id="scan-login-alert" style="margin-bottom:4px;"></div>
+      <label class="scan-login-label">Usuario</label>
+      <input id="scan-user" type="text" class="scan-login-input" placeholder="admin" autocomplete="username">
+      <label class="scan-login-label">Contraseña</label>
+      <input id="scan-pass" type="password" class="scan-login-input" placeholder="••••••" autocomplete="current-password">
+      <button onclick="doScanLogin()" class="scan-login-btn">Ingresar</button>
+      <p style="text-align:center; margin-top:16px; font-size:0.72rem; color:rgba(255,255,255,0.25);">Credenciales de demostración: admin / admin</p>
+    </div>
+  </div>
+</div>
+
 <!-- MINIMAL HEADER -->
+<div id="scan-app" style="display:none;">
 <div class="rec-header">
   <div class="nav-logo-mark" style="width:28px; height:28px; background:var(--accent); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; color:white; flex-shrink:0;">RR</div>
   <span class="rec-header-label">Modo Recolector</span>
@@ -301,6 +392,7 @@
 
   </div>
 </div>
+</div><!-- /#scan-app -->
 
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -447,11 +539,38 @@
     if (e.key === 'Enter') searchManual();
   });
 
-  // Check URL hash on load
-  const hash = window.location.hash;
-  if (hash && hash.startsWith('#pickup/')) {
-    const code = hash.replace('#pickup/', '').trim();
-    if (code) loadPickupView(code);
+  function showApp() {
+    document.getElementById('scan-login-view').style.display = 'none';
+    document.getElementById('scan-app').style.display = 'block';
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#pickup/')) {
+      const code = hash.replace('#pickup/', '').trim();
+      if (code) loadPickupView(code);
+    }
+  }
+
+  function doScanLogin() {
+    const user = document.getElementById('scan-user').value.trim();
+    const pass = document.getElementById('scan-pass').value.trim();
+    if (user === 'admin' && pass === 'admin') {
+      sessionStorage.setItem('scan_auth', 'true');
+      showApp();
+    } else {
+      document.getElementById('scan-login-alert').innerHTML =
+        '<div class="alert-dark-error" style="margin-bottom:12px;">Usuario o contraseña incorrectos.</div>';
+    }
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && document.getElementById('scan-login-view').style.display !== 'none') {
+      doScanLogin();
+    }
+  });
+
+  if (sessionStorage.getItem('scan_auth') === 'true') {
+    showApp();
+  } else {
+    document.getElementById('scan-login-view').style.display = 'block';
   }
 </script>
 
