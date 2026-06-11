@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>ReciRetiro Smart — Flyer QR</title>
+  <style>
+    @page { size: A4; margin: 0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+      width: 210mm;
+      min-height: 297mm;
+      background: #ffffff;
+      color: #0f2318;
+      display: flex;
+      flex-direction: column;
+    }
+    .top-band {
+      background: #0f2318;
+      padding: 12mm 18mm 10mm;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .rr-mark {
+      width: 38px; height: 38px;
+      background: #3a9e6b; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 900; color: white;
+      flex-shrink: 0;
+    }
+    .brand-name { font-size: 15px; font-weight: 800; color: white; }
+    .brand-sub  { font-size: 10px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+    .top-right  { text-align: right; }
+    .top-right p { font-size: 10px; color: rgba(255,255,255,0.4); }
+    .top-right strong { font-size: 12px; color: rgba(255,255,255,0.7); }
+
+    .main { flex: 1; padding: 10mm 18mm 0; display: flex; flex-direction: column; }
+
+    .hero-row {
+      display: flex;
+      gap: 20mm;
+      align-items: flex-start;
+      padding-bottom: 9mm;
+      border-bottom: 1.5px solid #e8f2ec;
+      margin-bottom: 9mm;
+    }
+    .qr-side { display: flex; flex-direction: column; align-items: center; gap: 10px; flex-shrink: 0; }
+    .qr-wrapper {
+      border: 2px solid #1a4731;
+      border-radius: 10px;
+      padding: 10px;
+      background: white;
+    }
+    .qr-label {
+      font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: #5a7a66; text-align: center;
+    }
+    .qr-code-text {
+      font-size: 11px; font-family: 'Courier New', monospace;
+      color: #1a4731; font-weight: 700; text-align: center;
+      letter-spacing: 1px;
+    }
+
+    .text-side { flex: 1; padding-top: 4px; }
+    .eyebrow {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: #3a9e6b; margin-bottom: 8px;
+    }
+    h1 {
+      font-size: 26px; font-weight: 900; line-height: 1.1;
+      letter-spacing: -0.02em; color: #0f2318; margin-bottom: 10px;
+    }
+    .hero-desc {
+      font-size: 12.5px; color: #4a7060; line-height: 1.65;
+      margin-bottom: 14px;
+    }
+    .mini-steps { display: flex; flex-direction: column; gap: 8px; }
+    .mini-step  { display: flex; gap: 10px; align-items: flex-start; }
+    .mini-dot {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: #eaf3ee; color: #1a5c36;
+      font-size: 10px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .mini-step p { font-size: 12px; color: #0f2318; line-height: 1.5; }
+    .mini-step p strong { color: #1a4731; }
+
+    .levels-section { margin-bottom: 9mm; }
+    .section-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: #888;
+      margin-bottom: 8px;
+    }
+    .levels-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .level-card {
+      border-radius: 8px; padding: 12px 10px; text-align: center;
+    }
+    .level-emoji { font-size: 18px; margin-bottom: 5px; }
+    .level-name {
+      font-size: 9px; font-weight: 800; letter-spacing: 0.1em;
+      text-transform: uppercase; margin-bottom: 3px;
+    }
+    .level-range { font-size: 9px; opacity: 0.7; margin-bottom: 7px; }
+    .level-benefit { font-size: 9.5px; line-height: 1.45; text-align: left; }
+    .lv-b { background: #f5ebe0; color: #a0632a; }
+    .lv-p { background: #f0f0f0; color: #606060; }
+    .lv-o { background: #fef9e7; color: #b8860b; }
+    .lv-e { background: #e8f2ec; color: #1e5f3f; }
+
+    .cta-bar {
+      background: #1a4731; border-radius: 10px;
+      padding: 14px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 9mm;
+      gap: 16px;
+    }
+    .cta-text p  { font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 700; }
+    .cta-text span{ font-size: 11.5px; color: rgba(255,255,255,0.55); }
+    .cta-url {
+      font-size: 13px; font-weight: 800; color: #6fcf97;
+      white-space: nowrap; letter-spacing: 0.01em;
+    }
+
+    .footer {
+      padding: 0 18mm 10mm;
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid #e8f2ec; padding-top: 6px;
+      font-size: 10px; color: #bbb;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-band">
+    <div class="brand">
+      <div class="rr-mark">RR</div>
+      <div>
+        <div class="brand-name">ReciRetiro Smart</div>
+        <div class="brand-sub">Municipalidad de Providencia</div>
+      </div>
+    </div>
+    <div class="top-right">
+      <strong>Tu código QR único</strong>
+      <p>Guárdalo — lo usarás siempre</p>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <div class="hero-row">
+      <div class="qr-side">
+        <div class="qr-wrapper">
+          <div id="qr-container"></div>
+        </div>
+        <div class="qr-label">Código de ejemplo</div>
+        <div class="qr-code-text">REC-PROV-2743</div>
+      </div>
+      <div class="text-side">
+        <div class="eyebrow">Tu reciclaje, registrado</div>
+        <h1>Un QR.<br>Todo funciona.</h1>
+        <p class="hero-desc">Este código identifica tu basurero. El recolector lo escanea cuando pasa el camión, y tú puedes escanearlo en cualquier momento para ver tu nivel, historial y los beneficios que tienes activos.</p>
+        <div class="mini-steps">
+          <div class="mini-step">
+            <div class="mini-dot">1</div>
+            <p><strong>El camión pasa</strong> → el recolector escanea el QR de tu basurero → el retiro queda registrado automáticamente.</p>
+          </div>
+          <div class="mini-step">
+            <div class="mini-dot">2</div>
+            <p><strong>Escanea con tu celular</strong> para ver tu panel: historial de retiros, nivel actual y beneficios desbloqueados.</p>
+          </div>
+          <div class="mini-step">
+            <div class="mini-dot">3</div>
+            <p><strong>Acumulas puntos</strong> con cada retiro completado. Cuantos más, más beneficios reales de Providencia.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="levels-section">
+      <div class="section-label">Niveles de participación — últimos 6 meses</div>
+      <div class="levels-grid">
+        <div class="level-card lv-b">
+          <div class="level-emoji">♻️</div>
+          <div class="level-name">Bronce</div>
+          <div class="level-range">1 – 4 retiros</div>
+          <div class="level-benefit">Historial digital y estimación de CO₂ evitado</div>
+        </div>
+        <div class="level-card lv-p">
+          <div class="level-emoji">🌿</div>
+          <div class="level-name">Plata</div>
+          <div class="level-range">5 – 11 retiros</div>
+          <div class="level-benefit">Kit vermicompostera, talleres DAOM y certificado digital</div>
+        </div>
+        <div class="level-card lv-o">
+          <div class="level-emoji">⭐</div>
+          <div class="level-name">Oro</div>
+          <div class="level-range">12 – 23 retiros</div>
+          <div class="level-benefit">Descuento Petrobras, entradas culturales, Provisalud</div>
+        </div>
+        <div class="level-card lv-e">
+          <div class="level-emoji">💎</div>
+          <div class="level-name">Esmeralda</div>
+          <div class="level-range">24+ retiros</div>
+          <div class="level-benefit">Exención derecho de aseo y Plaza Persa preferencial</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-bar">
+      <div class="cta-text">
+        <p>Accede a tu panel personal en cualquier momento</p>
+        <span>Escanea el QR o ingresa desde el navegador</span>
+      </div>
+      <div class="cta-url">reciretiro-smart.vercel.app</div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <span>ReciRetiro Smart &nbsp;·&nbsp; Municipalidad de Providencia &nbsp;·&nbsp; Sistema de trazabilidad de reciclaje domiciliario</span>
+    <span>Junio 2026</span>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    new QRCode(document.getElementById('qr-container'), {
+      text: 'https://reciretiro-smart.vercel.app/perfil.html?code=REC-PROV-2743',
+      width: 140, height: 140,
+      colorDark: '#1a4731', colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  </script>
+</body>
+</html>

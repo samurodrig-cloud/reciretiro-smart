@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>ReciRetiro Smart — Pasos de la solución</title>
+  <style>
+    @page { size: A4; margin: 0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+      width: 210mm;
+      min-height: 297mm;
+      background: #ffffff;
+      color: #0f2318;
+      display: flex;
+      flex-direction: column;
+      padding: 14mm 18mm 12mm 18mm;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 10mm;
+      border-bottom: 1.5px solid #e8f2ec;
+      margin-bottom: 10mm;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 9px;
+    }
+    .rr-mark {
+      width: 34px; height: 34px;
+      background: #1a4731;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 900; color: white;
+    }
+    .brand-name {
+      font-size: 14px; font-weight: 700; color: #1a4731;
+    }
+    .brand-sub {
+      font-size: 10px; color: #6b9e82; margin-top: 1px;
+    }
+    .header-right {
+      font-size: 10px; color: #aaa; letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .page-title {
+      margin-bottom: 8mm;
+    }
+    .eyebrow {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: #3a9e6b; margin-bottom: 6px;
+    }
+    h1 {
+      font-size: 30px; font-weight: 900;
+      letter-spacing: -0.02em; color: #0f2318;
+      line-height: 1.1; margin-bottom: 8px;
+    }
+    .subtitle {
+      font-size: 13px; color: #5a7a66;
+      line-height: 1.55; max-width: 480px;
+    }
+    .steps {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 8mm;
+    }
+    .step {
+      display: flex;
+      gap: 20px;
+      padding: 16px 0;
+      border-bottom: 1px solid #f0f5f2;
+      align-items: flex-start;
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      font-size: 38px; font-weight: 900;
+      color: #d4ede0;
+      line-height: 1;
+      min-width: 52px;
+      padding-top: 2px;
+      letter-spacing: -0.03em;
+    }
+    .step-icon {
+      width: 44px; height: 44px;
+      background: #eaf3ee;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step-body { flex: 1; }
+    .step-title {
+      font-size: 16px; font-weight: 800;
+      color: #0f2318; margin-bottom: 5px;
+      letter-spacing: -0.01em;
+    }
+    .step-desc {
+      font-size: 12.5px; color: #4a7060;
+      line-height: 1.6;
+    }
+    .step-tag {
+      display: inline-block;
+      font-size: 9.5px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 2px 8px; border-radius: 4px;
+      margin-top: 6px;
+    }
+    .tag-vecino { background: #e8f2ec; color: #1a5c36; }
+    .tag-muni   { background: #e8eef8; color: #1a3a6b; }
+    .tag-rec    { background: #fff3e0; color: #7a4600; }
+    .tag-auto   { background: #f3e8f8; color: #5a1a7a; }
+    .why-box {
+      background: #0f2318;
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 8mm;
+    }
+    .why-icon {
+      font-size: 26px; flex-shrink: 0;
+    }
+    .why-text {
+      font-size: 12px; color: rgba(255,255,255,0.8);
+      line-height: 1.6;
+    }
+    .why-text strong { color: #6fcf97; }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 8px;
+      border-top: 1px solid #e8f2ec;
+    }
+    .footer-url { font-size: 10.5px; color: #aaa; }
+    .levels {
+      display: flex; gap: 10px;
+    }
+    .lvl {
+      font-size: 9.5px; font-weight: 700;
+      padding: 3px 9px; border-radius: 20px;
+    }
+    .lvl-b { background: #f5ebe0; color: #a0632a; }
+    .lvl-p { background: #f0f0f0; color: #606060; }
+    .lvl-o { background: #fef9e7; color: #b8860b; }
+    .lvl-e { background: #e8f2ec; color: #1e5f3f; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="brand">
+      <div class="rr-mark">RR</div>
+      <div>
+        <div class="brand-name">ReciRetiro Smart</div>
+        <div class="brand-sub">Municipalidad de Providencia</div>
+      </div>
+    </div>
+    <div class="header-right">Cómo funciona</div>
+  </div>
+
+  <div class="page-title">
+    <div class="eyebrow">La solución</div>
+    <h1>Cuatro pasos.<br>Cero complicaciones.</h1>
+    <p class="subtitle">Providencia ya tiene retiro domiciliario de reciclaje. ReciRetiro Smart añade trazabilidad completa e incentivos reales, sin cambiar la rutina del vecino ni del recolector.</p>
+  </div>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-icon">📝</div>
+      <div class="step-body">
+        <div class="step-title">El vecino se registra una sola vez</div>
+        <div class="step-desc">Ingresa a <strong>reciretiro-smart.vercel.app</strong> y completa el formulario con su nombre, dirección y sector. Opcionalmente vincula su Tarjeta Vecino Soy Providencia y activa recordatorios por WhatsApp. El sistema genera un código único (REC-PROV-XXXX) de forma automática.</div>
+        <span class="step-tag tag-vecino">Acción del vecino</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-icon">🗑️</div>
+      <div class="step-body">
+        <div class="step-title">La municipalidad entrega el basurero con su QR</div>
+        <div class="step-desc">El equipo de la DAOM imprime el código QR único del vecino y lo pega en el basurero de reciclaje. Este QR es permanente: identifica al vecino en todos los retiros futuros. No hay tarjetas, no hay apps que descargar.</div>
+        <span class="step-tag tag-muni">Acción municipal</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-icon">📱</div>
+      <div class="step-body">
+        <div class="step-title">El recolector escanea el QR en cada visita</div>
+        <div class="step-desc">Al pasar el camión, el recolector abre la interfaz de escaneo en su celular (sin instalar nada), apunta la cámara al QR del basurero y confirma el retiro con un toque. El registro queda guardado en tiempo real en la base de datos municipal.</div>
+        <span class="step-tag tag-rec">Acción del recolector</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-icon">🏆</div>
+      <div class="step-body">
+        <div class="step-title">El vecino acumula puntos y desbloquea beneficios reales</div>
+        <div class="step-desc">Cada retiro registrado suma al historial del vecino. Al alcanzar los umbrales del programa (Bronce → Plata → Oro → Esmeralda), se desbloquean beneficios reales de Providencia: kit vermicompostera, descuentos Petrobras, entradas culturales y, en el nivel máximo, exención del derecho de aseo.</div>
+        <span class="step-tag tag-auto">Automático</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="why-box">
+    <div class="why-icon">💡</div>
+    <div class="why-text">
+      <strong>El problema que resuelve:</strong> Providencia no tenía forma de saber quién recicla, con qué frecuencia, ni quién dejó de participar. ReciRetiro Smart convierte ese proceso invisible en datos reales, sin modificar la operación existente del servicio de retiro.
+    </div>
+  </div>
+
+  <div class="footer">
+    <span class="footer-url">reciretiro-smart.vercel.app</span>
+    <div class="levels">
+      <span class="lvl lvl-b">♻️ Bronce 1–4</span>
+      <span class="lvl lvl-p">🌿 Plata 5–11</span>
+      <span class="lvl lvl-o">⭐ Oro 12–23</span>
+      <span class="lvl lvl-e">💎 Esmeralda 24+</span>
+    </div>
+  </div>
+
+</body>
+</html>
