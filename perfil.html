@@ -236,34 +236,17 @@
       <div id="benefits-content"></div>
     </div>
 
-    <!-- QR CODES -->
-    <div class="card">
-      <h2 style="font-size:1rem; font-weight:700; margin-bottom:5px;">Mis dos códigos QR</h2>
+    <!-- QR CODE -->
+    <div class="card" style="text-align:center;">
+      <h2 style="font-size:1rem; font-weight:700; margin-bottom:5px;">Mi código QR</h2>
       <p style="font-size:0.85rem; color:var(--gray-dark); margin-bottom:20px;">
-        Tu basurero tiene estos dos QR impresos. Cada uno cumple una función distinta.
+        El recolector escanea este QR para registrar cada retiro. Tú también puedes escanearlo para acceder a tu perfil.
       </p>
-      <div class="qr-pair">
-        <div class="qr-panel" style="background:#f4f9f6;">
-          <div class="qr-panel-badge" style="background:var(--green-light); color:var(--green);">QR 1 — Recolector</div>
-          <div class="qr-panel-title">Para el camión municipal</div>
-          <div class="qr-panel-desc">El recolector escanea este QR al retirar tu reciclaje. Así se registra cada retiro automáticamente.</div>
-          <div id="qr1-container" style="display:inline-block; margin-bottom:14px;"></div>
-          <br>
-          <button onclick="downloadQR('qr1-container','QR-Recolector')" class="btn btn-outline" style="font-size:0.8rem; padding:7px 16px;">
-            Descargar QR Recolector
-          </button>
-        </div>
-        <div class="qr-panel" style="background:#eaf1fa;">
-          <div class="qr-panel-badge" style="background:var(--blue-light); color:var(--blue);">QR 2 — Perfil Público</div>
-          <div class="qr-panel-title">Para ver tu progreso</div>
-          <div class="qr-panel-desc">Cualquiera que escanee este QR puede ver tu nivel, cuánto has reciclado y tus beneficios activos.</div>
-          <div id="qr2-container" style="display:inline-block; margin-bottom:14px;"></div>
-          <br>
-          <button onclick="downloadQR('qr2-container','QR-Perfil')" class="btn btn-outline" style="font-size:0.8rem; padding:7px 16px; border-color:var(--blue); color:var(--blue);">
-            Descargar QR Perfil
-          </button>
-        </div>
-      </div>
+      <div id="qr1-container" style="display:inline-block; margin-bottom:16px;"></div>
+      <br>
+      <button onclick="downloadQR('qr1-container','QR-ReciRetiro')" class="btn btn-outline" style="font-size:0.8rem; padding:7px 16px;">
+        Descargar mi QR
+      </button>
     </div>
 
     <!-- ACTIONS -->
@@ -496,18 +479,12 @@
     });
     document.getElementById('benefits-content').innerHTML = benefitsHtml;
 
-    // QR CODES
-    const qr1Url = window.location.origin + '/scan.html#pickup/' + neighbor.code;
-    const qr2Url = window.location.origin + '/perfil.html?code='  + neighbor.code;
+    // QR CODE
+    const qrUrl = window.location.origin + '/perfil.html?code=' + neighbor.code;
 
     new QRCode(document.getElementById('qr1-container'), {
-      text: qr1Url, width: 160, height: 160,
+      text: qrUrl, width: 160, height: 160,
       colorDark: '#1a4731', colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.H
-    });
-    new QRCode(document.getElementById('qr2-container'), {
-      text: qr2Url, width: 160, height: 160,
-      colorDark: '#1a4a7a', colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.H
     });
   }
