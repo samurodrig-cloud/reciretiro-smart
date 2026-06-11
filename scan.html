@@ -22,6 +22,21 @@
       letter-spacing: 0.06em;
       text-transform: uppercase;
     }
+    .rec-home-link {
+      margin-left: auto;
+      color: rgba(255,255,255,0.35);
+      font-size: 0.78rem;
+      font-weight: 500;
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .rec-home-link:hover {
+      color: rgba(255,255,255,0.75);
+      background: rgba(255,255,255,0.08);
+    }
 
     .rec-main {
       max-width: 440px;
@@ -33,23 +48,24 @@
       width: 100%;
       background: var(--accent);
       border: none;
-      border-radius: 14px;
-      padding: 28px 20px;
+      border-radius: 20px;
+      padding: 36px 20px;
       color: white;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       font-family: inherit;
-      transition: background 0.15s, transform 0.1s;
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
       margin-bottom: 20px;
+      box-shadow: 0 6px 24px rgba(58,158,107,0.35);
     }
-    .scan-btn:hover { background: #2d8a5a; transform: translateY(-1px); }
-    .scan-btn:active { transform: scale(0.98); }
-    .scan-btn-icon { font-size: 2.4rem; line-height: 1; }
-    .scan-btn-label { font-size: 1.05rem; font-weight: 700; }
-    .scan-btn-sub { font-size: 0.78rem; opacity: 0.75; }
+    .scan-btn:hover { background: #2d8a5a; transform: translateY(-2px); box-shadow: 0 10px 30px rgba(58,158,107,0.4); }
+    .scan-btn:active { transform: scale(0.97); box-shadow: 0 3px 12px rgba(58,158,107,0.25); }
+    .scan-btn-icon { font-size: 3rem; line-height: 1; }
+    .scan-btn-label { font-size: 1.15rem; font-weight: 700; letter-spacing: 0.01em; }
+    .scan-btn-sub { font-size: 0.8rem; opacity: 0.72; }
 
     .rec-divider {
       display: flex;
@@ -216,6 +232,7 @@
 <div class="rec-header">
   <div class="nav-logo-mark" style="width:28px; height:28px; background:var(--accent); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; color:white; flex-shrink:0;">RR</div>
   <span class="rec-header-label">Modo Recolector</span>
+  <a href="index.html" class="rec-home-link">← Inicio</a>
 </div>
 
 <!-- SCANNER VIEW -->
@@ -223,7 +240,7 @@
   <div class="rec-main">
 
     <button class="scan-btn" id="scan-camera-btn" onclick="startCamera()">
-      <span class="scan-btn-icon">📷</span>
+      <span class="scan-btn-icon">♻️</span>
       <span class="scan-btn-label">Escanear código QR</span>
       <span class="scan-btn-sub">Toca para activar la cámara</span>
     </button>
